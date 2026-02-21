@@ -1,3 +1,78 @@
+<script setup lang="ts">
+import { useGameDataStore } from '../stores/gameData';
+import {
+  CHARACTER_NAMES,
+  ITEMS_PER_CHARACTER,
+  QUANTITY_ITEM_IDS,
+  TLA_ITEMS,
+} from '../codec';
+
+const store = useGameDataStore();
+
+const QUANTITY_SET = new Set(QUANTITY_ITEM_IDS);
+const SLOT_INDICES = Array.from({ length: ITEMS_PER_CHARACTER }, (_, i) => i);
+
+function isSelected(ci: number, si: number): boolean {
+  const s = store.selectedSlot;
+  return s !== null && s.charIndex === ci && s.slotIndex === si;
+}
+
+function clearSlot(ci: number, si: number) {
+  store.setItem(ci, si, 0, 0);
+  // If we just cleared the selected slot, keep it selected (ready for a new item)
+}
+
+function clampQuantity(ci: number, si: number, value: string) {
+  const slot = store.gameData.items[ci]![si]!;
+  let n = parseInt(value, 10);
+  if (isNaN(n) || n < 1) n = 1;
+  if (n > 30) n = 30;
+  store.setItem(ci, si, slot.itemId, n);
+}
+</script>
+
 <template>
-  <p class="text-sm text-gray-500">Item inventory (4 characters x 15 slots) — implemented in step 5</p>
+  <div v-if="!store.isGold" class="text-sm text-gray-500">
+    Items are only available in Gold passwords.
+  </div>
+  <div v-else class="grid grid-cols-4 gap-4">
+    <div v-for="(charName, ci) in CHARACTER_NAMES" :key="ci">
+      <h3 class="text-sm font-semibold text-gray-700 mb-2">{{ charName }}</h3>
+      <div class="space-y-1">
+        <div
+          v-for="si in SLOT_INDICES"
+          :key="si"
+          class="flex items-center gap-1 text-sm rounded px-1 py-0.5 cursor-pointer"
+          :class="isSelected(ci, si)
+            ? 'ring-2 ring-amber-500 bg-amber-50'
+            : 'hover:bg-gray-50'"
+          @click="store.selectSlot(ci, si)"
+        >
+          <template v-if="store.gameData.items[ci]![si]!.itemId === 0">
+            <span class="text-gray-400 flex-1">(empty)</span>
+          </template>
+          <template v-else>
+            <span class="flex-1 truncate text-gray-800">
+              {{ TLA_ITEMS.get(store.gameData.items[ci]![si]!.itemId) ?? `#${store.gameData.items[ci]![si]!.itemId}` }}
+            </span>
+            <input
+              v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)"
+              type="number"
+              min="1"
+              max="30"
+              :value="store.gameData.items[ci]![si]!.quantity"
+              @click.stop
+              @change="clampQuantity(ci, si, ($event.target as HTMLInputElement).value)"
+              class="w-12 border border-gray-300 rounded px-1 text-center text-xs"
+            >
+            <button
+              class="text-gray-400 hover:text-red-500 text-xs px-1"
+              title="Clear slot"
+              @click.stop="clearSlot(ci, si)"
+            >&times;</button>
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
