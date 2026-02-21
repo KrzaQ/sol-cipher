@@ -23,9 +23,19 @@ watch(
   { deep: true, immediate: true },
 );
 
-// Sync generated password → textarea
+function formatPassword(raw: string): string {
+  let result = '';
+  for (let i = 0; i < raw.length; i++) {
+    result += raw[i];
+    if ((i + 1) % 10 === 0) result += '\n';
+    else if ((i + 1) % 5 === 0) result += ' ';
+  }
+  return result;
+}
+
+// Sync generated password → textarea (formatted)
 watch(() => store.generatedPassword, (pw) => {
-  passwordText.value = pw;
+  passwordText.value = formatPassword(pw);
 });
 
 function onPaste(e: ClipboardEvent) {
@@ -68,7 +78,7 @@ function onInput(e: Event) {
       :value="passwordText"
       @input="onInput"
       @paste="onPaste"
-      rows="6"
+      rows="14"
       placeholder="Paste or type a password..."
       class="w-full rounded border border-gray-300 bg-white p-2 text-sm font-mono resize-y focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
     />
