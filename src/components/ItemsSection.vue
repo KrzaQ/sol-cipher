@@ -12,14 +12,16 @@ const store = useGameDataStore();
 const QUANTITY_SET = new Set(QUANTITY_ITEM_IDS);
 const SLOT_INDICES = Array.from({ length: ITEMS_PER_CHARACTER }, (_, i) => i);
 
-function isSelected(ci: number, si: number): boolean {
-  const s = store.selectedSlot;
-  return s !== null && s.charIndex === ci && s.slotIndex === si;
+function toggleChar(ci: number) {
+  if (store.selectedCharIndex === ci) {
+    store.clearSelection();
+  } else {
+    store.selectChar(ci);
+  }
 }
 
 function clearSlot(ci: number, si: number) {
   store.setItem(ci, si, 0, 0);
-  // If we just cleared the selected slot, keep it selected (ready for a new item)
 }
 
 function clampQuantity(ci: number, si: number, value: string) {
@@ -29,6 +31,11 @@ function clampQuantity(ci: number, si: number, value: string) {
   if (n > 30) n = 30;
   store.setItem(ci, si, slot.itemId, n);
 }
+
+function setQuantity(ci: number, si: number, qty: number) {
+  const slot = store.gameData.items[ci]![si]!;
+  store.setItem(ci, si, slot.itemId, qty);
+}
 </script>
 
 <template>
@@ -36,17 +43,21 @@ function clampQuantity(ci: number, si: number, value: string) {
     Items are only available in Gold passwords.
   </div>
   <div v-else class="grid grid-cols-4 gap-4">
-    <div v-for="(charName, ci) in CHARACTER_NAMES" :key="ci">
+    <div
+      v-for="(charName, ci) in CHARACTER_NAMES"
+      :key="ci"
+      class="rounded-lg p-2 cursor-pointer"
+      :class="store.selectedCharIndex === ci
+        ? 'ring-2 ring-amber-500 bg-amber-50'
+        : 'hover:bg-gray-50'"
+      @click="toggleChar(ci)"
+    >
       <h3 class="text-sm font-semibold text-gray-700 mb-2">{{ charName }}</h3>
       <div class="space-y-1">
         <div
           v-for="si in SLOT_INDICES"
           :key="si"
-          class="flex items-center gap-1 text-sm rounded px-1 py-0.5 cursor-pointer"
-          :class="isSelected(ci, si)
-            ? 'ring-2 ring-amber-500 bg-amber-50'
-            : 'hover:bg-gray-50'"
-          @click="store.selectSlot(ci, si)"
+          class="flex items-center gap-1 text-sm px-1 py-0.5"
         >
           <template v-if="store.gameData.items[ci]![si]!.itemId === 0">
             <span class="text-gray-400 flex-1">(empty)</span>
@@ -55,16 +66,27 @@ function clampQuantity(ci: number, si: number, value: string) {
             <span class="flex-1 truncate text-gray-800">
               {{ TLA_ITEMS.get(store.gameData.items[ci]![si]!.itemId) ?? `#${store.gameData.items[ci]![si]!.itemId}` }}
             </span>
-            <input
-              v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)"
-              type="number"
-              min="1"
-              max="30"
-              :value="store.gameData.items[ci]![si]!.quantity"
-              @click.stop
-              @change="clampQuantity(ci, si, ($event.target as HTMLInputElement).value)"
-              class="w-12 border border-gray-300 rounded px-1 text-center text-xs"
-            >
+            <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
+              <button
+                class="text-gray-400 hover:text-indigo-600 text-xs px-0.5"
+                title="Set quantity to 1"
+                @click.stop="setQuantity(ci, si, 1)"
+              >1</button>
+              <input
+                type="number"
+                min="1"
+                max="30"
+                :value="store.gameData.items[ci]![si]!.quantity"
+                @click.stop
+                @change="clampQuantity(ci, si, ($event.target as HTMLInputElement).value)"
+                class="w-10 border border-gray-300 rounded px-1 text-center text-xs"
+              >
+              <button
+                class="text-gray-400 hover:text-indigo-600 text-xs px-0.5"
+                title="Set quantity to 30"
+                @click.stop="setQuantity(ci, si, 30)"
+              >30</button>
+            </template>
             <button
               class="text-gray-400 hover:text-red-500 text-xs px-1"
               title="Clear slot"

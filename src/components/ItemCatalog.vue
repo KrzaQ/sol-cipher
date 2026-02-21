@@ -24,8 +24,8 @@ const filteredItems = computed(() => {
 
 // Set of item IDs held by the currently selected character
 const heldItemIds = computed<Set<number>>(() => {
-  if (!store.selectedSlot) return new Set();
-  const charItems = store.gameData.items[store.selectedSlot.charIndex]!;
+  if (store.selectedCharIndex === null) return new Set();
+  const charItems = store.gameData.items[store.selectedCharIndex]!;
   const ids = new Set<number>();
   for (const slot of charItems) {
     if (slot.itemId !== 0) ids.add(slot.itemId);
@@ -33,7 +33,7 @@ const heldItemIds = computed<Set<number>>(() => {
   return ids;
 });
 
-const hasSelection = computed(() => store.selectedSlot !== null);
+const hasSelection = computed(() => store.selectedCharIndex !== null);
 
 function pickItem(itemId: number) {
   if (!hasSelection.value) return;
@@ -55,7 +55,7 @@ function pickItem(itemId: number) {
     >
 
     <p v-if="!hasSelection" class="text-xs text-gray-400">
-      Select a slot in the Items section to assign items.
+      Select a character in the Items section to assign items.
     </p>
 
     <div class="overflow-y-auto max-h-[60vh] -mx-1">
