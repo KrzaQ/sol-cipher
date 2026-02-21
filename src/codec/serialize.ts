@@ -83,7 +83,7 @@ export function serializeGameData(gd: GameData, pwType: PasswordType): Uint8Arra
         let qty = 0;
         for (let slot = 0; slot < 15; slot++) {
           if ((gd.items[charIdx]![slot]!.itemId & 0x1FF) === qtyItemId) {
-            qty = gd.items[charIdx]![slot]!.quantity & 0x1F;
+            qty = Math.max(gd.items[charIdx]![slot]!.quantity - 1, 0) & 0x1F;
           }
         }
         // Pack 5-bit quantity into bitstream

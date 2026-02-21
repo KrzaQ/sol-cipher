@@ -152,7 +152,7 @@ export function deserializeGameData(buf: Uint8Array, pwType: PasswordType): Game
       }
 
       if (targetSlot !== null) {
-        gd.items[charIdx]![targetSlot]!.quantity = qty;
+        gd.items[charIdx]![targetSlot]!.quantity = qty + 1;
       }
     }
   }
