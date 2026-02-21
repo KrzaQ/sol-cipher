@@ -25,3 +25,4 @@ export {
 } from './constants';
 export type { EventFlag, StatDefinition, CrossGameDifference } from './constants';
 export { GS1_ITEMS, TLA_ITEMS } from './items';
+export { passwordToUrl, urlToPassword } from './urlEncoding';

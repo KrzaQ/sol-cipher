@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useGameDataStore } from '../stores/gameData';
-import { PasswordType, PASSWORD_CHAR_COUNTS } from '../codec';
+import { PasswordType, PASSWORD_CHAR_COUNTS, passwordToUrl, urlToPassword } from '../codec';
 
 const store = useGameDataStore();
 const passwordText = ref('');
@@ -42,9 +42,18 @@ function formatPassword(raw: string): string {
   return result;
 }
 
-// Sync generated password → textarea (formatted)
+// Sync generated password → textarea (formatted) and update URL hash
 watch(() => store.generatedPassword, (pw) => {
   passwordText.value = formatPassword(pw);
+  history.replaceState(null, '', '#' + passwordToUrl(pw));
+});
+
+// On mount: decode password from URL hash if present
+onMounted(() => {
+  const hash = window.location.hash.slice(1);
+  if (hash) {
+    store.decodePassword(urlToPassword(hash));
+  }
 });
 
 function onPaste(e: ClipboardEvent) {
