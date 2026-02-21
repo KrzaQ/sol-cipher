@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useGameDataStore } from '../stores/gameData';
-import { PasswordType } from '../codec';
+import { PasswordType, PASSWORD_CHAR_COUNTS } from '../codec';
 
 const store = useGameDataStore();
 const passwordText = ref('');
+
+const VALID_LENGTHS = new Set(Object.values(PASSWORD_CHAR_COUNTS));
 
 const presets = ['Story Clear', 'Completionist', 'Debug'];
 
@@ -14,17 +16,31 @@ const typeOptions = [
   { value: PasswordType.Bronze, label: 'Bronze (16 chars)' },
 ] as const;
 
+// Reactive encode: state → password
+watch(
+  () => [store.gameData, store.passwordType],
+  () => store.generatePassword(),
+  { deep: true, immediate: true },
+);
+
+// Sync generated password → textarea
 watch(() => store.generatedPassword, (pw) => {
   passwordText.value = pw;
 });
 
-function generate() {
-  store.generatePassword();
-  passwordText.value = store.generatedPassword;
+function onPaste(e: ClipboardEvent) {
+  e.preventDefault();
+  const text = e.clipboardData?.getData('text') ?? '';
+  store.decodePassword(text);
 }
 
-function decodeInput() {
-  store.decodePassword(passwordText.value);
+function onInput(e: Event) {
+  const raw = (e.target as HTMLTextAreaElement).value;
+  passwordText.value = raw;
+  const stripped = raw.replace(/\s/g, '');
+  if (VALID_LENGTHS.has(stripped.length)) {
+    store.decodePassword(stripped);
+  }
 }
 </script>
 
@@ -49,22 +65,13 @@ function decodeInput() {
     </fieldset>
 
     <textarea
-      v-model="passwordText"
+      :value="passwordText"
+      @input="onInput"
+      @paste="onPaste"
       rows="6"
-      placeholder="Paste a password to decode, or click Generate..."
+      placeholder="Paste or type a password..."
       class="w-full rounded border border-gray-300 bg-white p-2 text-sm font-mono resize-y focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
     />
-
-    <div class="flex gap-2">
-      <button
-        @click="generate"
-        class="flex-1 rounded bg-amber-600 px-3 py-2 text-sm font-medium text-white hover:bg-amber-700 active:bg-amber-800"
-      >Generate</button>
-      <button
-        @click="decodeInput"
-        class="flex-1 rounded bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 active:bg-indigo-800"
-      >Decode</button>
-    </div>
 
     <p
       v-if="store.decodeError"

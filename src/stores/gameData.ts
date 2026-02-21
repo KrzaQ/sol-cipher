@@ -16,6 +16,7 @@ interface GameDataState {
   gameData: GameData;
   passwordType: PasswordType;
   generatedPassword: string;
+  lastValidPassword: string;
   decodeError: string;
   selectedCharIndex: number | null;
 }
@@ -25,6 +26,7 @@ export const useGameDataStore = defineStore('gameData', {
     gameData: createEmptyGameData(),
     passwordType: PasswordType.Gold,
     generatedPassword: '',
+    lastValidPassword: '',
     decodeError: '',
     selectedCharIndex: null,
   }),
@@ -52,6 +54,7 @@ export const useGameDataStore = defineStore('gameData', {
     reset() {
       this.gameData = createEmptyGameData();
       this.generatedPassword = '';
+      this.lastValidPassword = '';
       this.decodeError = '';
       this.selectedCharIndex = null;
     },
@@ -59,11 +62,15 @@ export const useGameDataStore = defineStore('gameData', {
     generatePassword() {
       this.decodeError = '';
       this.generatedPassword = encode(this.gameData, this.passwordType);
+      this.lastValidPassword = this.generatedPassword;
     },
 
     decodePassword(input: string) {
-      const result = decode(input);
+      const stripped = input.replace(/\s/g, '');
+      if (stripped === this.lastValidPassword) return;
+      const result = decode(stripped);
       if (result.ok) {
+        this.lastValidPassword = encode(result.data, result.passwordType);
         this.gameData = result.data;
         this.passwordType = result.passwordType;
         this.decodeError = '';
