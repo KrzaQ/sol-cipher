@@ -24,11 +24,20 @@ watch(
 );
 
 function formatPassword(raw: string): string {
+  const ROWS_PER_PAGE = 5;
+  const CHARS_PER_ROW = 10;
   let result = '';
   for (let i = 0; i < raw.length; i++) {
     result += raw[i];
-    if ((i + 1) % 10 === 0) result += '\n';
-    else if ((i + 1) % 5 === 0) result += ' ';
+    const pos = i + 1;
+    if (pos % CHARS_PER_ROW === 0) {
+      result += '\n';
+      if (pos % (CHARS_PER_ROW * ROWS_PER_PAGE) === 0 && pos < raw.length) {
+        result += '\n';
+      }
+    } else if (pos % 5 === 0) {
+      result += ' ';
+    }
   }
   return result;
 }
