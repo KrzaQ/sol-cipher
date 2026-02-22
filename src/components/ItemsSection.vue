@@ -34,7 +34,7 @@ function toggleChar(ci: number) {
 }
 
 function clearSlot(ci: number, si: number) {
-  store.setItem(ci, si, 0, 0);
+  store.removeItem(ci, si);
 }
 
 function clampQuantity(ci: number, si: number, value: string) {

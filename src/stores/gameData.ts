@@ -100,6 +100,12 @@ export const useGameDataStore = defineStore('gameData', {
       this.gameData.items[charIndex]![slotIndex] = { itemId, quantity };
     },
 
+    removeItem(charIndex: number, slotIndex: number) {
+      const charItems = this.gameData.items[charIndex]!;
+      charItems.splice(slotIndex, 1);
+      charItems.push({ itemId: 0, quantity: 0 });
+    },
+
     selectChar(charIndex: number) {
       this.selectedCharIndex = charIndex;
     },
