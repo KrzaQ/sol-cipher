@@ -10,8 +10,8 @@ import ItemCatalog from './components/ItemCatalog.vue'
 </script>
 
 <template>
-  <div class="h-dvh flex flex-col overflow-y-auto lg:overflow-hidden lg:grid lg:grid-rows-[auto_1fr] lg:grid-cols-[280px_minmax(0,40rem)_280px] lg:justify-center">
-    <header class="col-span-full relative flex items-center justify-center border-b border-gray-700 bg-gray-950 px-4 py-5 overflow-hidden">
+  <div class="h-dvh flex flex-col overflow-y-auto lg:overflow-hidden">
+    <header class="shrink-0 relative flex items-center justify-center border-b border-gray-700 bg-gray-950 px-4 py-5 overflow-hidden">
       <SolCipherLogo :size="100" class="absolute opacity-70" />
       <h1 class="relative text-5xl tracking-widest uppercase banner-title z-10">Sol Cipher</h1>
       <div class="banner-particles" aria-hidden="true">
@@ -27,11 +27,12 @@ import ItemCatalog from './components/ItemCatalog.vue'
       <a href="https://github.com/KrzaQ/sol-cipher/" class="absolute bottom-1 right-4 text-[10px] tracking-widest uppercase text-amber-700/60 hover:text-amber-500 z-10">by KrzaQ</a>
     </header>
 
-    <aside class="border-b lg:border-b-0 lg:border-r border-gray-700 lg:overflow-y-auto p-4 lg:self-center">
+    <div class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:grid lg:grid-cols-[280px_minmax(0,40rem)_280px] lg:justify-center">
+    <aside class="border-b lg:border-b-0 lg:border-r border-gray-700 p-4 lg:sticky lg:top-0 lg:self-start">
       <PasswordSidebar />
     </aside>
 
-    <main class="lg:overflow-y-auto p-4 space-y-4 min-h-0">
+    <main class="p-4 space-y-4">
       <CollapsibleSection title="Characters">
         <CharactersSection />
       </CollapsibleSection>
@@ -46,9 +47,10 @@ import ItemCatalog from './components/ItemCatalog.vue'
       </CollapsibleSection>
     </main>
 
-    <aside class="border-t lg:border-t-0 lg:border-l border-gray-700 lg:overflow-y-auto p-4 lg:self-center">
+    <aside class="border-t lg:border-t-0 lg:border-l border-gray-700 p-4 lg:sticky lg:top-0 lg:self-start">
       <ItemCatalog />
     </aside>
+    </div>
   </div>
 </template>
 
