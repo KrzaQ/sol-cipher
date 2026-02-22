@@ -19,7 +19,7 @@ function toggle() {
   <section class="border border-gray-700 rounded-lg">
     <button
       type="button"
-      class="flex w-full items-center justify-between px-4 py-3 text-left font-semibold text-amber-50 hover:bg-gray-800/50 border-b border-amber-700/60"
+      class="flex w-full items-center justify-between px-4 py-3 text-left font-semibold text-amber-50 hover:bg-gray-800/50"
       :aria-expanded="isOpen"
       @click="toggle"
     >
