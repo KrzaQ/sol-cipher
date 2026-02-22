@@ -11,9 +11,12 @@ import {
   QUEST_ITEM_IDS,
   MAX_GS1_ITEM_ID,
   CROSS_GAME_DIFFERENCES,
+  SPECIAL_ITEM_IDS,
   TLA_ITEMS,
+  type ItemSlot,
 } from '../codec';
 import { CHAR_COLORS } from '../elementColors';
+import CollapsibleSection from './CollapsibleSection.vue';
 
 const store = useGameDataStore();
 
@@ -24,6 +27,49 @@ const REQUIRED_SET = new Set(REQUIRED_ITEM_IDS);
 const QUEST_SET = new Set(QUEST_ITEM_IDS);
 const CROSS_GAME_MAP = new Map(CROSS_GAME_DIFFERENCES.map(d => [d.id, d.gs1Name]));
 const SLOT_INDICES = Array.from({ length: ITEMS_PER_CHARACTER }, (_, i) => i);
+
+const E = { itemId: 0, quantity: 0 };
+function I(id: number, q = 0): ItemSlot { return { itemId: id, quantity: q }; }
+function pad(slots: ItemSlot[]): ItemSlot[] {
+  return [...slots, ...Array(ITEMS_PER_CHARACTER - slots.length).fill(E)];
+}
+
+const ITEM_PRESETS: { name: string; items: ItemSlot[][] }[] = [
+  { name: 'Minimal', items: [
+    pad([I(0xDE), I(0xF2)]), // Isaac: Mythril Bag + Black Crystal
+    pad([]),
+    pad([]),
+    pad([]),
+  ]},
+  { name: 'Psy', items: [
+    pad([I(0xDE), I(0xF2), ...SPECIAL_ITEM_IDS.map(id => I(id))]), // Req + 8 psynergy items
+    pad([]),
+    pad([]),
+    pad([]),
+  ]},
+  { name: 'Story Clear', items: [
+    pad([I(0x09), I(0x97), I(0x83), I(0x55), I(0x100), I(0xCF), I(0xCE), I(0x107), I(0xFA), I(0xEF, 30), I(0xE5, 12), I(0xE4, 27), I(0xDE), I(0xF2)]),
+    pad([I(0x0B), I(0x98), I(0x84), I(0x52), I(0x100), I(0x10C), I(0xFA), I(0xE9)]),
+    pad([I(0x19), I(0xA0), I(0x8D), I(0x70), I(0x101), I(0xCC), I(0xC8), I(0x106), I(0xFC), I(0xBA, 15)]),
+    pad([I(0x40), I(0x9F), I(0x8C), I(0x71), I(0x101), I(0xCD), I(0xCB), I(0xCA), I(0xC9), I(0x109), I(0xFB), I(0xBD, 15), I(0xB7, 30), I(0xEF, 25)]),
+  ]},
+  { name: 'Completionist', items: [
+    pad([I(0xF2), I(0xEF, 30), I(0xE5, 12), I(0xE4, 30), I(0xDE), I(0x09), I(0xA4), I(0x97), I(0x83), I(0x55), I(0x100), I(0xCF), I(0xCE), I(0x107), I(0xFA)]),
+    pad([I(0xEF, 30), I(0xBD, 30), I(0x32), I(0x26), I(0x0B), I(0xA2), I(0x98), I(0x84), I(0x60), I(0x54), I(0x53), I(0x52), I(0x100), I(0x10C), I(0xFA)]),
+    pad([I(0xEF, 30), I(0xBA, 30), I(0xB7, 30), I(0x19), I(0x15), I(0xA1), I(0xA0), I(0x8D), I(0x70), I(0x62), I(0x101), I(0xCC), I(0xC8), I(0x106), I(0xFC)]),
+    pad([I(0xEF, 30), I(0xBD, 30), I(0xB7, 30), I(0x40), I(0x31), I(0x9F), I(0x8C), I(0x71), I(0x101), I(0xCD), I(0xCB), I(0xCA), I(0xC9), I(0x109), I(0xFB)]),
+  ]},
+  { name: 'Ultimate', items: [
+    pad([I(0x0A), I(0xA4), I(0x97), I(0x16B), I(0x16B), I(0x16D), I(0x18C), I(0x60), I(0x177), I(0x174), I(0x174), I(0x148), I(0x114), I(0x114), I(0x114)]),
+    pad([I(0x141), I(0x142), I(0x143), I(0x125), I(0x110), I(0x112), I(0x129), I(0x132), I(0x150), I(0x159), I(0x159), I(0x15C), I(0x70), I(0x70), I(0x165)]),
+    pad([I(0xBF, 30), I(0xC0, 30), I(0xC1, 30), I(0xC2, 30), I(0xC3, 30), I(0xC4, 30), I(0xE4, 30), I(0xE5, 30), I(0x10C), I(0x10C), I(0x197), I(0x197), I(0x197), I(0x197), I(0xCD)]),
+    pad([I(0xCA), I(0xC9), I(0xCC), I(0xCF), I(0xCE), I(0xCB), I(0xC8), I(0xF2), I(0xDE), I(0xC4, 30), I(0xC3, 30), I(0xC2, 30), I(0xC1, 30), I(0xC0, 30), I(0xBF, 30)]),
+  ]},
+];
+
+function applyPreset(preset: typeof ITEM_PRESETS[number]) {
+  store.setAllItems(preset.items);
+}
 
 function toggleChar(ci: number) {
   if (store.selectedCharIndex === ci) {
@@ -58,71 +104,84 @@ function setQuantity(ci: number, si: number, qty: number) {
 </script>
 
 <template>
-  <div v-if="!store.isGold" class="text-sm text-gray-400">
-    Items are only available in Gold passwords.
-  </div>
-  <div v-else class="grid gap-2" :style="{ gridTemplateColumns: itemGridCols }">
-    <div
-      v-for="(charName, ci) in CHARACTER_NAMES"
-      :key="ci"
-      class="rounded-lg p-2 cursor-pointer border border-gray-800 bg-gray-900/50 min-w-0"
-      :class="store.selectedCharIndex === ci
-        ? ['ring-1', CHAR_COLORS[ci]!.ring, CHAR_COLORS[ci]!.selectedBg]
-        : CHAR_COLORS[ci]!.hoverBg"
-      @click="toggleChar(ci)"
-    >
-      <h3 class="text-sm font-semibold mb-2" :class="CHAR_COLORS[ci]!.heading">{{ charName }}</h3>
-      <div class="space-y-1">
-        <div
-          v-for="si in SLOT_INDICES"
-          :key="si"
-          class="flex items-center gap-1 text-sm px-1 py-0.5"
-        >
-          <template v-if="store.gameData.items[ci]![si]!.itemId === 0">
-            <span class="text-gray-600 flex-1">(empty)</span>
-          </template>
-          <template v-else>
-            <span class="flex-1 truncate text-amber-50">
-              {{ TLA_ITEMS.get(store.gameData.items[ci]![si]!.itemId) ?? `#${store.gameData.items[ci]![si]!.itemId}` }}
-            </span>
-            <span v-if="CROSS_GAME_MAP.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-orange-400" :title="`Called '${CROSS_GAME_MAP.get(store.gameData.items[ci]![si]!.itemId)}' in GS1`">GS1</span>
-            <span v-if="REQUIRED_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-red-400" title="Required for TLA completion">Req</span>
-            <span v-if="PSYNERGY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
-            <span v-if="KEY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
-            <span v-if="QUEST_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
-            <span v-if="store.gameData.items[ci]![si]!.itemId > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
-            <span v-if="store.selectedCharIndex === null && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">{{ store.gameData.items[ci]![si]!.quantity }}</span>
-            <template v-if="store.selectedCharIndex === ci">
-              <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
-                <button
-                  class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
-                  title="Set quantity to 1"
-                  @click.stop="setQuantity(ci, si, 1)"
-                >1</button>
-                <input
-                  type="number"
-                  min="1"
-                  max="30"
-                  :value="store.gameData.items[ci]![si]!.quantity"
-                  @click.stop
-                  @change="clampQuantity(ci, si, ($event.target as HTMLInputElement).value)"
-                  class="w-10 border border-gray-700 bg-gray-800 text-amber-50 rounded px-1 text-center text-xs"
-                >
-                <button
-                  class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
-                  title="Set quantity to 30"
-                  @click.stop="setQuantity(ci, si, 30)"
-                >30</button>
-              </template>
-              <button
-                class="text-gray-500 hover:text-red-400 text-xs px-1"
-                title="Clear slot"
-                @click.stop="clearSlot(ci, si)"
-              >&times;</button>
+  <CollapsibleSection title="Items">
+    <template #header-right>
+      <div v-if="store.isGold" class="flex gap-1 font-normal">
+        <template v-for="(preset, i) in ITEM_PRESETS" :key="preset.name">
+          <span v-if="i > 0" class="text-xs text-gray-600">|</span>
+          <button
+            @click="applyPreset(preset)"
+            class="text-xs text-amber-400 hover:text-amber-300"
+          >{{ preset.name }}</button>
+        </template>
+      </div>
+    </template>
+    <div v-if="!store.isGold" class="text-sm text-gray-400">
+      Items are only available in Gold passwords.
+    </div>
+    <div v-else class="grid gap-2" :style="{ gridTemplateColumns: itemGridCols }">
+      <div
+        v-for="(charName, ci) in CHARACTER_NAMES"
+        :key="ci"
+        class="rounded-lg p-2 cursor-pointer border border-gray-800 bg-gray-900/50 min-w-0"
+        :class="store.selectedCharIndex === ci
+          ? ['ring-1', CHAR_COLORS[ci]!.ring, CHAR_COLORS[ci]!.selectedBg]
+          : CHAR_COLORS[ci]!.hoverBg"
+        @click="toggleChar(ci)"
+      >
+        <h3 class="text-sm font-semibold mb-2" :class="CHAR_COLORS[ci]!.heading">{{ charName }}</h3>
+        <div class="space-y-1">
+          <div
+            v-for="si in SLOT_INDICES"
+            :key="si"
+            class="flex items-center gap-1 text-sm px-1 py-0.5"
+          >
+            <template v-if="store.gameData.items[ci]![si]!.itemId === 0">
+              <span class="text-gray-600 flex-1">(empty)</span>
             </template>
-          </template>
+            <template v-else>
+              <span class="flex-1 truncate text-amber-50">
+                {{ TLA_ITEMS.get(store.gameData.items[ci]![si]!.itemId) ?? `#${store.gameData.items[ci]![si]!.itemId}` }}
+              </span>
+              <span v-if="CROSS_GAME_MAP.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-orange-400" :title="`Called '${CROSS_GAME_MAP.get(store.gameData.items[ci]![si]!.itemId)}' in GS1`">GS1</span>
+              <span v-if="REQUIRED_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-red-400" title="Required for TLA completion">Req</span>
+              <span v-if="PSYNERGY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
+              <span v-if="KEY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
+              <span v-if="QUEST_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
+              <span v-if="store.gameData.items[ci]![si]!.itemId > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
+              <span v-if="store.selectedCharIndex === null && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">{{ store.gameData.items[ci]![si]!.quantity }}</span>
+              <template v-if="store.selectedCharIndex === ci">
+                <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
+                  <button
+                    class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
+                    title="Set quantity to 1"
+                    @click.stop="setQuantity(ci, si, 1)"
+                  >1</button>
+                  <input
+                    type="number"
+                    min="1"
+                    max="30"
+                    :value="store.gameData.items[ci]![si]!.quantity"
+                    @click.stop
+                    @change="clampQuantity(ci, si, ($event.target as HTMLInputElement).value)"
+                    class="w-10 border border-gray-700 bg-gray-800 text-amber-50 rounded px-1 text-center text-xs"
+                  >
+                  <button
+                    class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
+                    title="Set quantity to 30"
+                    @click.stop="setQuantity(ci, si, 30)"
+                  >30</button>
+                </template>
+                <button
+                  class="text-gray-500 hover:text-red-400 text-xs px-1"
+                  title="Clear slot"
+                  @click.stop="clearSlot(ci, si)"
+                >&times;</button>
+              </template>
+            </template>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </CollapsibleSection>
 </template>

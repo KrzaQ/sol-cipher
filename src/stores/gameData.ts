@@ -100,6 +100,12 @@ export const useGameDataStore = defineStore('gameData', {
       this.gameData.items[charIndex]![slotIndex] = { itemId, quantity };
     },
 
+    setAllItems(items: { itemId: number; quantity: number }[][]) {
+      for (let ci = 0; ci < items.length; ci++) {
+        this.gameData.items[ci] = items[ci]!.slice();
+      }
+    },
+
     removeItem(charIndex: number, slotIndex: number) {
       const charItems = this.gameData.items[charIndex]!;
       charItems.splice(slotIndex, 1);
