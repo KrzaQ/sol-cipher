@@ -9,8 +9,15 @@ import ItemCatalog from './components/ItemCatalog.vue'
 </script>
 
 <template>
-  <div class="h-dvh flex flex-col overflow-y-auto
-              lg:overflow-hidden lg:grid lg:grid-cols-[280px_minmax(0,40rem)_280px] lg:justify-center">
+  <div class="h-dvh flex flex-col overflow-y-auto lg:overflow-hidden lg:grid lg:grid-rows-[auto_1fr] lg:grid-cols-[280px_minmax(0,40rem)_280px] lg:justify-center">
+    <header class="col-span-full flex items-center justify-between border-b border-gray-200 px-4 py-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded bg-amber-600 text-white font-bold text-sm">SC</span>
+        <h1 class="text-lg font-bold text-gray-800">Sol Cipher</h1>
+      </div>
+      <a href="https://github.com/KrzaQ/sol-cipher/" class="text-xs text-gray-400 hover:text-gray-600">by KrzaQ</a>
+    </header>
+
     <aside class="border-b lg:border-b-0 lg:border-r border-gray-200 lg:overflow-y-auto p-4 lg:self-center">
       <PasswordSidebar />
     </aside>
