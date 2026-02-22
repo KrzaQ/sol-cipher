@@ -42,6 +42,7 @@ function clampCoins(value: string) {
           class="accent-amber-600"
         >
         {{ flag.name }}
+        <span v-if="flag.name === 'Hsu Died'" class="text-[10px] text-gray-500 cursor-help" title="Inverted: unchecked = Hsu rescued (quest complete)">?</span>
       </label>
     </div>
   </CollapsibleSection>
