@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useGameDataStore } from '../stores/gameData';
 import { PasswordType, PASSWORD_CHAR_COUNTS, passwordToUrl, urlToPassword } from '../codec';
 
 const store = useGameDataStore();
-const passwordText = ref('');
 
-const VALID_LENGTHS = new Set(Object.values(PASSWORD_CHAR_COUNTS));
+const TOTAL_PAGES = 6;
+const CHARS_PER_ROW = 10;
+const ROWS_PER_PAGE = 5;
+const CHARS_PER_PAGE = CHARS_PER_ROW * ROWS_PER_PAGE;
 
 const presets = ['Story Clear', 'Completionist', 'Debug'];
 
@@ -23,28 +25,42 @@ watch(
   { deep: true, immediate: true },
 );
 
-function formatPassword(raw: string): string {
-  const ROWS_PER_PAGE = 5;
-  const CHARS_PER_ROW = 10;
-  let result = '';
-  for (let i = 0; i < raw.length; i++) {
-    result += raw[i];
-    const pos = i + 1;
-    if (pos % CHARS_PER_ROW === 0) {
-      result += '\n';
-      if (pos % (CHARS_PER_ROW * ROWS_PER_PAGE) === 0 && pos < raw.length) {
-        result += '\n';
-      }
-    } else if (pos % 5 === 0) {
-      result += ' ';
+// 5 rows of "XXXXX XXXXX" as a placeholder for consistent page height
+const EMPTY_PAGE = Array(ROWS_PER_PAGE).fill('\u00A0'.repeat(11)).join('\n');
+
+/** Split raw password into 6 pages of formatted rows. */
+function formatPages(raw: string): string[] {
+  const pages: string[] = [];
+  for (let p = 0; p < TOTAL_PAGES; p++) {
+    const pageChars = raw.slice(p * CHARS_PER_PAGE, (p + 1) * CHARS_PER_PAGE);
+    if (!pageChars.length) {
+      pages.push(EMPTY_PAGE);
+      continue;
     }
+    const rows: string[] = [];
+    for (let r = 0; r < ROWS_PER_PAGE; r++) {
+      const rowChars = pageChars.slice(r * CHARS_PER_ROW, (r + 1) * CHARS_PER_ROW);
+      if (!rowChars.length) {
+        rows.push('\u00A0'.repeat(11));
+        continue;
+      }
+      rows.push(rowChars.slice(0, 5) + ' ' + rowChars.slice(5));
+    }
+    pages.push(rows.join('\n'));
   }
-  return result;
+  return pages;
 }
 
-// Sync generated password → textarea (formatted) and update URL hash
+const pages = ref<string[]>(Array(TOTAL_PAGES).fill(''));
+
+const activePages = computed(() => {
+  const charCount = store.generatedPassword.length;
+  return Math.ceil(charCount / CHARS_PER_PAGE);
+});
+
+// Sync generated password → pages display and update URL hash
 watch(() => store.generatedPassword, (pw) => {
-  passwordText.value = formatPassword(pw);
+  pages.value = formatPages(pw);
   history.replaceState(null, '', '#' + passwordToUrl(pw));
 });
 
@@ -62,13 +78,13 @@ function onPaste(e: ClipboardEvent) {
   store.decodePassword(text);
 }
 
-function onInput(e: Event) {
-  const raw = (e.target as HTMLTextAreaElement).value;
-  passwordText.value = raw;
-  const stripped = raw.replace(/\s/g, '');
-  if (VALID_LENGTHS.has(stripped.length)) {
-    store.decodePassword(stripped);
-  }
+async function onCopy() {
+  await navigator.clipboard.writeText(store.generatedPassword);
+}
+
+async function onPasteButton() {
+  const text = await navigator.clipboard.readText();
+  store.decodePassword(text);
 }
 </script>
 
@@ -92,14 +108,33 @@ function onInput(e: Event) {
       </label>
     </fieldset>
 
-    <textarea
-      :value="passwordText"
-      @input="onInput"
+    <div
+      class="grid grid-cols-2 grid-flow-col grid-rows-3 gap-1 rounded border border-gray-300 bg-gray-50 p-2"
       @paste="onPaste"
-      rows="14"
-      placeholder="Paste or type a password..."
-      class="w-full rounded border border-gray-300 bg-white p-2 text-sm font-mono resize-y focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-    />
+      tabindex="0"
+    >
+      <div
+        v-for="(page, i) in pages"
+        :key="i"
+        class="rounded px-1.5 py-1 text-xs font-mono leading-relaxed whitespace-pre select-text"
+        :class="i < activePages
+          ? 'bg-white text-gray-800'
+          : 'bg-gray-100 text-gray-300'"
+      >
+        <span class="text-[10px] font-sans text-gray-400 block mb-0.5">{{ i + 1 }}</span><span v-text="page"></span>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button
+        @click="onCopy"
+        class="flex-1 rounded border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+      >Copy</button>
+      <button
+        @click="onPasteButton"
+        class="flex-1 rounded border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+      >Paste</button>
+    </div>
 
     <p
       v-if="store.decodeError"

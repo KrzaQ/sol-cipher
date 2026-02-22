@@ -10,8 +10,8 @@ import ItemCatalog from './components/ItemCatalog.vue'
 
 <template>
   <div class="h-dvh flex flex-col overflow-y-auto
-              lg:overflow-hidden lg:grid lg:grid-cols-[280px_1fr_280px]">
-    <aside class="border-b lg:border-b-0 lg:border-r border-gray-200 lg:overflow-y-auto p-4">
+              lg:overflow-hidden lg:grid lg:grid-cols-[280px_minmax(0,40rem)_280px] lg:justify-center">
+    <aside class="border-b lg:border-b-0 lg:border-r border-gray-200 lg:overflow-y-auto p-4 lg:self-center">
       <PasswordSidebar />
     </aside>
 
@@ -30,7 +30,7 @@ import ItemCatalog from './components/ItemCatalog.vue'
       </CollapsibleSection>
     </main>
 
-    <aside class="border-t lg:border-t-0 lg:border-l border-gray-200 lg:overflow-y-auto p-4">
+    <aside class="border-t lg:border-t-0 lg:border-l border-gray-200 lg:overflow-y-auto p-4 lg:self-center">
       <ItemCatalog />
     </aside>
   </div>
