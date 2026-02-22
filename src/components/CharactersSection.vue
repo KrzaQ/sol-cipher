@@ -2,6 +2,7 @@
 import { useGameDataStore } from '../stores/gameData';
 import { CHARACTER_NAMES, STAT_DEFINITIONS, clamp } from '../codec';
 import type { CharacterStats } from '../codec';
+import { CHAR_COLORS } from '../elementColors';
 
 const store = useGameDataStore();
 
@@ -26,7 +27,7 @@ function onStatInput(charIndex: number, key: keyof CharacterStats, min: number, 
 <template>
   <div class="grid grid-cols-4 gap-4">
     <div v-for="(name, charIndex) in CHARACTER_NAMES" :key="name">
-      <h3 class="text-sm font-semibold text-amber-50 mb-2">{{ name }}</h3>
+      <h3 class="text-sm font-semibold mb-2" :class="CHAR_COLORS[charIndex]!.heading">{{ name }}</h3>
       <div class="space-y-1">
         <div v-for="stat in STAT_DEFINITIONS" :key="stat.key" class="flex items-center gap-1">
           <label class="w-14 text-xs text-gray-400 text-right shrink-0">{{ STAT_LABELS[stat.key] }}</label>

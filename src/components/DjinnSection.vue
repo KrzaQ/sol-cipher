@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { useGameDataStore } from '../stores/gameData';
 import { DJINN_NAMES, DJINN_PER_ELEMENT, type Element } from '../codec';
+import { ELEMENT_COLORS } from '../elementColors';
 
 const store = useGameDataStore();
 
 const ELEMENT_NAMES: { name: string; index: Element }[] = [
   { name: 'Venus', index: 0 },
-  { name: 'Mercury', index: 1 },
   { name: 'Mars', index: 2 },
   { name: 'Jupiter', index: 3 },
+  { name: 'Mercury', index: 1 },
 ];
 
 function isDjinnSet(elementIndex: Element, djinnIndex: number): boolean {
@@ -47,16 +48,16 @@ function clearAllGlobal() {
   </div>
   <div class="grid grid-cols-4 gap-4">
     <div v-for="elem in ELEMENT_NAMES" :key="elem.index">
-      <h3 class="text-sm font-semibold text-amber-50 mb-1">{{ elem.name }}</h3>
+      <h3 class="text-sm font-semibold mb-1" :class="ELEMENT_COLORS[elem.index].heading">{{ elem.name }}</h3>
       <div class="flex gap-1 mb-2">
         <button
           @click="selectAll(elem.index)"
-          class="text-xs text-amber-400 hover:text-amber-300"
+          class="text-xs" :class="ELEMENT_COLORS[elem.index].link"
         >All</button>
         <span class="text-xs text-gray-600">|</span>
         <button
           @click="clearAll(elem.index)"
-          class="text-xs text-amber-400 hover:text-amber-300"
+          class="text-xs" :class="ELEMENT_COLORS[elem.index].link"
         >None</button>
       </div>
       <div class="space-y-1">
@@ -69,7 +70,7 @@ function clearAllGlobal() {
             type="checkbox"
             :checked="isDjinnSet(elem.index, djinnIndex)"
             @change="toggleDjinn(elem.index, djinnIndex)"
-            class="accent-amber-600"
+            :class="ELEMENT_COLORS[elem.index].accent"
           >
           {{ djinnName }}
         </label>

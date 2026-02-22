@@ -7,6 +7,7 @@ import {
   QUANTITY_ITEM_IDS,
   TLA_ITEMS,
 } from '../codec';
+import { CHAR_COLORS } from '../elementColors';
 
 const store = useGameDataStore();
 
@@ -53,13 +54,13 @@ function setQuantity(ci: number, si: number, qty: number) {
     <div
       v-for="(charName, ci) in CHARACTER_NAMES"
       :key="ci"
-      class="rounded-lg p-2 cursor-pointer"
+      class="rounded-lg p-2 cursor-pointer border border-gray-800 bg-gray-900/50"
       :class="store.selectedCharIndex === ci
-        ? 'ring-2 ring-amber-500 bg-amber-900/40'
-        : 'hover:bg-gray-800/50'"
+        ? ['ring-1', CHAR_COLORS[ci]!.ring, CHAR_COLORS[ci]!.selectedBg]
+        : CHAR_COLORS[ci]!.hoverBg"
       @click="toggleChar(ci)"
     >
-      <h3 class="text-sm font-semibold text-amber-50 mb-2">{{ charName }}</h3>
+      <h3 class="text-sm font-semibold mb-2" :class="CHAR_COLORS[ci]!.heading">{{ charName }}</h3>
       <div class="space-y-1">
         <div
           v-for="si in SLOT_INDICES"
