@@ -87,12 +87,29 @@ function onPaste(e: ClipboardEvent) {
 }
 
 async function onCopy() {
-  await navigator.clipboard.writeText(store.generatedPassword);
+  try {
+    await navigator.clipboard.writeText(store.generatedPassword);
+  } catch {
+    // Fallback for non-HTTPS contexts
+    const ta = document.createElement('textarea');
+    ta.value = store.generatedPassword;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
 }
 
 async function onPasteButton() {
-  const text = await navigator.clipboard.readText();
-  store.decodePassword(text);
+  try {
+    const text = await navigator.clipboard.readText();
+    store.decodePassword(text);
+  } catch {
+    // Clipboard read requires HTTPS + permission; no good fallback
+    store.decodeError = 'Paste failed — clipboard access requires HTTPS. Use Ctrl+V instead.';
+  }
 }
 </script>
 
