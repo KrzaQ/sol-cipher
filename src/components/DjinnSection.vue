@@ -2,6 +2,7 @@
 import { useGameDataStore } from '../stores/gameData';
 import { DJINN_NAMES, DJINN_PER_ELEMENT, type Element } from '../codec';
 import { ELEMENT_COLORS } from '../elementColors';
+import CollapsibleSection from './CollapsibleSection.vue';
 
 const store = useGameDataStore();
 
@@ -41,40 +42,46 @@ function clearAllGlobal() {
 </script>
 
 <template>
-  <div class="flex gap-1 mb-3">
-    <button @click="selectAllGlobal" class="text-xs text-amber-400 hover:text-amber-300">All</button>
-    <span class="text-xs text-gray-600">|</span>
-    <button @click="clearAllGlobal" class="text-xs text-amber-400 hover:text-amber-300">None</button>
-  </div>
-  <div class="grid grid-cols-4 gap-2">
-    <div v-for="elem in ELEMENT_NAMES" :key="elem.index" class="rounded-lg p-2 border border-gray-800 bg-gray-900/50">
-      <h3 class="text-sm font-semibold mb-1" :class="ELEMENT_COLORS[elem.index].heading">{{ elem.name }}</h3>
-      <div class="flex gap-1 mb-2">
-        <button
-          @click="selectAll(elem.index)"
-          class="text-xs" :class="ELEMENT_COLORS[elem.index].link"
-        >All</button>
+  <CollapsibleSection title="Djinn">
+    <template #header-right>
+      <div class="flex gap-1 font-normal">
+        <button @click="selectAllGlobal" class="text-xs text-amber-400 hover:text-amber-300">All</button>
         <span class="text-xs text-gray-600">|</span>
-        <button
-          @click="clearAll(elem.index)"
-          class="text-xs" :class="ELEMENT_COLORS[elem.index].link"
-        >None</button>
+        <button @click="clearAllGlobal" class="text-xs text-amber-400 hover:text-amber-300">None</button>
       </div>
-      <div class="space-y-1">
-        <label
-          v-for="(djinnName, djinnIndex) in DJINN_NAMES[elem.index]"
-          :key="djinnIndex"
-          class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer"
-        >
-          <input
-            type="checkbox"
-            :checked="isDjinnSet(elem.index, djinnIndex)"
-            @change="toggleDjinn(elem.index, djinnIndex)"
-            :class="ELEMENT_COLORS[elem.index].accent"
+    </template>
+    <div class="grid grid-cols-4 gap-2">
+      <div v-for="elem in ELEMENT_NAMES" :key="elem.index" class="rounded-lg p-2 border border-gray-800 bg-gray-900/50">
+        <div class="flex items-center justify-between mb-1">
+          <h3 class="text-sm font-semibold" :class="ELEMENT_COLORS[elem.index].heading">{{ elem.name }}</h3>
+          <div class="flex gap-1">
+            <button
+              @click="selectAll(elem.index)"
+              class="text-xs" :class="ELEMENT_COLORS[elem.index].link"
+            >All</button>
+            <span class="text-xs text-gray-600">|</span>
+            <button
+              @click="clearAll(elem.index)"
+              class="text-xs" :class="ELEMENT_COLORS[elem.index].link"
+            >None</button>
+          </div>
+        </div>
+        <div class="space-y-1">
+          <label
+            v-for="(djinnName, djinnIndex) in DJINN_NAMES[elem.index]"
+            :key="djinnIndex"
+            class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer"
           >
-          {{ djinnName }}
-        </label>
+            <input
+              type="checkbox"
+              :checked="isDjinnSet(elem.index, djinnIndex)"
+              @change="toggleDjinn(elem.index, djinnIndex)"
+              :class="ELEMENT_COLORS[elem.index].accent"
+            >
+            {{ djinnName }}
+          </label>
+        </div>
       </div>
     </div>
-  </div>
+  </CollapsibleSection>
 </template>

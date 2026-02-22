@@ -36,9 +36,7 @@ import ItemCatalog from './components/ItemCatalog.vue'
       <CollapsibleSection title="Characters">
         <CharactersSection />
       </CollapsibleSection>
-      <CollapsibleSection title="Djinn">
-        <DjinnSection />
-      </CollapsibleSection>
+      <DjinnSection />
       <CollapsibleSection title="Items">
         <ItemsSection />
       </CollapsibleSection>
