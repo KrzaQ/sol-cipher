@@ -46,7 +46,7 @@ function clearAllGlobal() {
     <span class="text-xs text-gray-600">|</span>
     <button @click="clearAllGlobal" class="text-xs text-amber-400 hover:text-amber-300">None</button>
   </div>
-  <div class="grid grid-cols-4 gap-4">
+  <div class="grid grid-cols-4 gap-2">
     <div v-for="elem in ELEMENT_NAMES" :key="elem.index" class="rounded-lg p-2 border border-gray-800 bg-gray-900/50">
       <h3 class="text-sm font-semibold mb-1" :class="ELEMENT_COLORS[elem.index].heading">{{ elem.name }}</h3>
       <div class="flex gap-1 mb-2">

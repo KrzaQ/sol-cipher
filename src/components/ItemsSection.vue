@@ -5,6 +5,12 @@ import {
   CHARACTER_NAMES,
   ITEMS_PER_CHARACTER,
   QUANTITY_ITEM_IDS,
+  PSYNERGY_ITEM_IDS,
+  KEY_ITEM_IDS,
+  REQUIRED_ITEM_IDS,
+  QUEST_ITEM_IDS,
+  MAX_GS1_ITEM_ID,
+  CROSS_GAME_DIFFERENCES,
   TLA_ITEMS,
 } from '../codec';
 import { CHAR_COLORS } from '../elementColors';
@@ -12,6 +18,11 @@ import { CHAR_COLORS } from '../elementColors';
 const store = useGameDataStore();
 
 const QUANTITY_SET = new Set(QUANTITY_ITEM_IDS);
+const PSYNERGY_SET = new Set(PSYNERGY_ITEM_IDS);
+const KEY_SET = new Set(KEY_ITEM_IDS);
+const REQUIRED_SET = new Set(REQUIRED_ITEM_IDS);
+const QUEST_SET = new Set(QUEST_ITEM_IDS);
+const CROSS_GAME_MAP = new Map(CROSS_GAME_DIFFERENCES.map(d => [d.id, d.gs1Name]));
 const SLOT_INDICES = Array.from({ length: ITEMS_PER_CHARACTER }, (_, i) => i);
 
 function toggleChar(ci: number) {
@@ -50,7 +61,7 @@ function setQuantity(ci: number, si: number, qty: number) {
   <div v-if="!store.isGold" class="text-sm text-gray-400">
     Items are only available in Gold passwords.
   </div>
-  <div v-else class="grid gap-4" :style="{ gridTemplateColumns: itemGridCols }">
+  <div v-else class="grid gap-2" :style="{ gridTemplateColumns: itemGridCols }">
     <div
       v-for="(charName, ci) in CHARACTER_NAMES"
       :key="ci"
@@ -74,6 +85,12 @@ function setQuantity(ci: number, si: number, qty: number) {
             <span class="flex-1 truncate text-amber-50">
               {{ TLA_ITEMS.get(store.gameData.items[ci]![si]!.itemId) ?? `#${store.gameData.items[ci]![si]!.itemId}` }}
             </span>
+            <span v-if="CROSS_GAME_MAP.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-orange-400" :title="`Called '${CROSS_GAME_MAP.get(store.gameData.items[ci]![si]!.itemId)}' in GS1`">GS1</span>
+            <span v-if="REQUIRED_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-red-400" title="Required for TLA completion">Req</span>
+            <span v-if="PSYNERGY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
+            <span v-if="KEY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
+            <span v-if="QUEST_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
+            <span v-if="store.gameData.items[ci]![si]!.itemId > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
             <span v-if="store.selectedCharIndex === null && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">{{ store.gameData.items[ci]![si]!.quantity }}</span>
             <template v-if="store.selectedCharIndex === ci">
               <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
