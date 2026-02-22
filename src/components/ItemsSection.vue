@@ -74,6 +74,7 @@ function setQuantity(ci: number, si: number, qty: number) {
             <span class="flex-1 truncate text-amber-50">
               {{ TLA_ITEMS.get(store.gameData.items[ci]![si]!.itemId) ?? `#${store.gameData.items[ci]![si]!.itemId}` }}
             </span>
+            <span v-if="store.selectedCharIndex !== ci && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">×{{ store.gameData.items[ci]![si]!.quantity }}</span>
             <template v-if="store.selectedCharIndex === ci">
               <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
                 <button
