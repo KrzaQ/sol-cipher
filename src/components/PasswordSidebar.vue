@@ -21,9 +21,9 @@ function loadPreset(password: string) {
 }
 
 const typeOptions = [
-  { value: PasswordType.Gold, label: 'Gold (260 chars)' },
-  { value: PasswordType.Silver, label: 'Silver (61 chars)' },
-  { value: PasswordType.Bronze, label: 'Bronze (16 chars)' },
+  { value: PasswordType.Gold, label: 'Gold (260 chars)', selected: 'bg-amber-900/40 border-amber-500 text-amber-200', unselected: 'border-gray-700 text-gray-500 hover:border-gray-600' },
+  { value: PasswordType.Silver, label: 'Silver (61 chars)', selected: 'bg-gray-700/40 border-gray-400 text-gray-200', unselected: 'border-gray-700 text-gray-500 hover:border-gray-600' },
+  { value: PasswordType.Bronze, label: 'Bronze (16 chars)', selected: 'bg-orange-900/40 border-orange-700 text-orange-200', unselected: 'border-gray-700 text-gray-500 hover:border-gray-600' },
 ] as const;
 
 // Reactive encode: state → password
@@ -134,13 +134,14 @@ async function onPasteButton() {
       <label
         v-for="opt in typeOptions"
         :key="opt.value"
-        class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer"
+        class="block rounded border px-3 py-1.5 text-sm cursor-pointer transition-colors"
+        :class="store.passwordType === opt.value ? opt.selected : opt.unselected"
       >
         <input
           type="radio"
           :value="opt.value"
           v-model="store.passwordType"
-          class="accent-amber-600"
+          class="sr-only"
         >
         {{ opt.label }}
       </label>
