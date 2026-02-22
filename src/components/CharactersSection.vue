@@ -27,7 +27,7 @@ function onStatInput(charIndex: number, key: keyof CharacterStats, min: number, 
 <template>
   <div class="grid grid-cols-4 gap-2">
     <div v-for="(name, charIndex) in CHARACTER_NAMES" :key="name" class="rounded-lg p-2 border border-gray-800 bg-gray-900/50">
-      <h3 class="text-sm font-semibold mb-2" :class="CHAR_COLORS[charIndex]!.heading">{{ name }}</h3>
+      <h3 class="text-sm font-semibold mb-2" :class="CHAR_COLORS[charIndex]!.heading" style="font-family: 'Cinzel Decorative', serif">{{ name }}</h3>
       <div class="space-y-1">
         <div v-for="stat in STAT_DEFINITIONS" :key="stat.key" class="flex items-center gap-1">
           <label class="w-12 text-xs text-gray-400 shrink-0">{{ STAT_LABELS[stat.key] }}</label>

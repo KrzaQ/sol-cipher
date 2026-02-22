@@ -77,7 +77,7 @@ function gs1Name(itemId: number): string | undefined {
 
 <template>
   <div class="space-y-3">
-    <h2 class="text-lg font-bold text-amber-50">Item Catalog</h2>
+    <h2 class="text-lg font-bold text-amber-50" style="font-family: 'Cinzel Decorative', serif">Item Catalog</h2>
 
     <input
       v-model="search"

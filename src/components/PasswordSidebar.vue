@@ -128,7 +128,7 @@ async function onPasteButton() {
 
 <template>
   <div class="space-y-4">
-    <h2 class="text-lg font-bold text-amber-50">Password</h2>
+    <h2 class="text-lg font-bold text-amber-50" style="font-family: 'Cinzel Decorative', serif">Password</h2>
 
     <fieldset class="space-y-1">
       <label

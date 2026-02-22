@@ -22,15 +22,15 @@ function toggleDjinn(elementIndex: Element, djinnIndex: number) {
   store.setDjinn(elementIndex, current ^ (1 << djinnIndex));
 }
 
-function selectAll(elementIndex: Element) {
-  store.setDjinn(elementIndex, (1 << DJINN_PER_ELEMENT) - 1);
-}
-
-function clearAll(elementIndex: Element) {
-  store.setDjinn(elementIndex, 0);
-}
-
 const allMask = (1 << DJINN_PER_ELEMENT) - 1;
+
+function isAllSet(elementIndex: Element): boolean {
+  return (store.gameData.djinn[elementIndex]! & allMask) === allMask;
+}
+
+function toggleAll(elementIndex: Element) {
+  store.setDjinn(elementIndex, isAllSet(elementIndex) ? 0 : allMask);
+}
 
 function selectAllGlobal() {
   for (const elem of ELEMENT_NAMES) store.setDjinn(elem.index, allMask);
@@ -53,18 +53,11 @@ function clearAllGlobal() {
     <div class="grid grid-cols-4 gap-2">
       <div v-for="elem in ELEMENT_NAMES" :key="elem.index" class="rounded-lg p-2 border border-gray-800 bg-gray-900/50">
         <div class="flex items-center justify-between mb-1">
-          <h3 class="text-sm font-semibold" :class="ELEMENT_COLORS[elem.index].heading">{{ elem.name }}</h3>
-          <div class="flex gap-1">
-            <button
-              @click="selectAll(elem.index)"
-              class="text-xs" :class="ELEMENT_COLORS[elem.index].link"
-            >All</button>
-            <span class="text-xs text-gray-600">|</span>
-            <button
-              @click="clearAll(elem.index)"
-              class="text-xs" :class="ELEMENT_COLORS[elem.index].link"
-            >None</button>
-          </div>
+          <h3 class="text-sm font-semibold" :class="ELEMENT_COLORS[elem.index].heading" style="font-family: 'Cinzel Decorative', serif">{{ elem.name }}</h3>
+          <button
+            @click="toggleAll(elem.index)"
+            class="text-xs" :class="ELEMENT_COLORS[elem.index].link"
+          >{{ isAllSet(elem.index) ? 'None' : 'All' }}</button>
         </div>
         <div class="space-y-1">
           <label

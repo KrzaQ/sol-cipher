@@ -129,7 +129,7 @@ function setQuantity(ci: number, si: number, qty: number) {
           : CHAR_COLORS[ci]!.hoverBg"
         @click="toggleChar(ci)"
       >
-        <h3 class="text-sm font-semibold mb-2" :class="CHAR_COLORS[ci]!.heading">{{ charName }}</h3>
+        <h3 class="text-sm font-semibold mb-2" :class="CHAR_COLORS[ci]!.heading" style="font-family: 'Cinzel Decorative', serif">{{ charName }}</h3>
         <div class="space-y-1">
           <div
             v-for="si in SLOT_INDICES"
