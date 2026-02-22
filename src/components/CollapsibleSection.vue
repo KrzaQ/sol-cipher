@@ -16,10 +16,10 @@ function toggle() {
 </script>
 
 <template>
-  <section class="border border-gray-200 rounded-lg">
+  <section class="border border-gray-700 rounded-lg">
     <button
       type="button"
-      class="flex w-full items-center justify-between px-4 py-3 text-left font-semibold text-gray-800 hover:bg-gray-50"
+      class="flex w-full items-center justify-between px-4 py-3 text-left font-semibold text-amber-50 hover:bg-gray-800/50 border-b border-amber-700/60"
       :aria-expanded="isOpen"
       @click="toggle"
     >

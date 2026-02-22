@@ -44,17 +44,16 @@ function pickItem(itemId: number) {
 
 <template>
   <div class="space-y-3">
-    <h2 class="text-lg font-bold text-gray-800">Item Catalog</h2>
+    <h2 class="text-lg font-bold text-amber-50">Item Catalog</h2>
 
     <input
       v-model="search"
       type="search"
       placeholder="Search items..."
-      class="w-full rounded border border-gray-300 p-2 text-sm"
-      :class="hasSelection ? 'bg-white' : 'bg-gray-100'"
+      class="w-full rounded border border-gray-700 bg-gray-800 text-amber-50 placeholder:text-gray-500 p-2 text-sm"
     >
 
-    <p v-if="!hasSelection" class="text-xs text-gray-400">
+    <p v-if="!hasSelection" class="text-xs text-gray-500">
       Select a character in the Items section to assign items.
     </p>
 
@@ -66,8 +65,8 @@ function pickItem(itemId: number) {
         class="block w-full text-left px-2 py-1 text-sm rounded"
         :class="
           !hasSelection || heldItemIds.has(item.id)
-            ? 'text-gray-400 cursor-default'
-            : 'text-gray-800 hover:bg-amber-50 cursor-pointer'
+            ? 'text-gray-600 cursor-default'
+            : 'text-amber-50 hover:bg-amber-900/30 cursor-pointer'
         "
         :disabled="!hasSelection || heldItemIds.has(item.id)"
         @click="pickItem(item.id)"

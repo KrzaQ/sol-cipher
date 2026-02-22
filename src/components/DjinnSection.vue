@@ -41,29 +41,29 @@ function clearAllGlobal() {
 
 <template>
   <div class="flex gap-1 mb-3">
-    <button @click="selectAllGlobal" class="text-xs text-indigo-600 hover:text-indigo-800">All</button>
-    <span class="text-xs text-gray-300">|</span>
-    <button @click="clearAllGlobal" class="text-xs text-indigo-600 hover:text-indigo-800">None</button>
+    <button @click="selectAllGlobal" class="text-xs text-amber-400 hover:text-amber-300">All</button>
+    <span class="text-xs text-gray-600">|</span>
+    <button @click="clearAllGlobal" class="text-xs text-amber-400 hover:text-amber-300">None</button>
   </div>
   <div class="grid grid-cols-4 gap-4">
     <div v-for="elem in ELEMENT_NAMES" :key="elem.index">
-      <h3 class="text-sm font-semibold text-gray-700 mb-1">{{ elem.name }}</h3>
+      <h3 class="text-sm font-semibold text-amber-50 mb-1">{{ elem.name }}</h3>
       <div class="flex gap-1 mb-2">
         <button
           @click="selectAll(elem.index)"
-          class="text-xs text-indigo-600 hover:text-indigo-800"
+          class="text-xs text-amber-400 hover:text-amber-300"
         >All</button>
-        <span class="text-xs text-gray-300">|</span>
+        <span class="text-xs text-gray-600">|</span>
         <button
           @click="clearAll(elem.index)"
-          class="text-xs text-indigo-600 hover:text-indigo-800"
+          class="text-xs text-amber-400 hover:text-amber-300"
         >None</button>
       </div>
       <div class="space-y-1">
         <label
           v-for="(djinnName, djinnIndex) in DJINN_NAMES[elem.index]"
           :key="djinnIndex"
-          class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer"
+          class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer"
         >
           <input
             type="checkbox"

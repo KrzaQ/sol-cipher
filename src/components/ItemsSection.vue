@@ -39,7 +39,7 @@ function setQuantity(ci: number, si: number, qty: number) {
 </script>
 
 <template>
-  <div v-if="!store.isGold" class="text-sm text-gray-500">
+  <div v-if="!store.isGold" class="text-sm text-gray-400">
     Items are only available in Gold passwords.
   </div>
   <div v-else class="grid grid-cols-4 gap-4">
@@ -48,11 +48,11 @@ function setQuantity(ci: number, si: number, qty: number) {
       :key="ci"
       class="rounded-lg p-2 cursor-pointer"
       :class="store.selectedCharIndex === ci
-        ? 'ring-2 ring-amber-500 bg-amber-50'
-        : 'hover:bg-gray-50'"
+        ? 'ring-2 ring-amber-500 bg-amber-900/40'
+        : 'hover:bg-gray-800/50'"
       @click="toggleChar(ci)"
     >
-      <h3 class="text-sm font-semibold text-gray-700 mb-2">{{ charName }}</h3>
+      <h3 class="text-sm font-semibold text-amber-50 mb-2">{{ charName }}</h3>
       <div class="space-y-1">
         <div
           v-for="si in SLOT_INDICES"
@@ -60,15 +60,15 @@ function setQuantity(ci: number, si: number, qty: number) {
           class="flex items-center gap-1 text-sm px-1 py-0.5"
         >
           <template v-if="store.gameData.items[ci]![si]!.itemId === 0">
-            <span class="text-gray-400 flex-1">(empty)</span>
+            <span class="text-gray-600 flex-1">(empty)</span>
           </template>
           <template v-else>
-            <span class="flex-1 truncate text-gray-800">
+            <span class="flex-1 truncate text-amber-50">
               {{ TLA_ITEMS.get(store.gameData.items[ci]![si]!.itemId) ?? `#${store.gameData.items[ci]![si]!.itemId}` }}
             </span>
             <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
               <button
-                class="text-gray-400 hover:text-indigo-600 text-xs px-0.5"
+                class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
                 title="Set quantity to 1"
                 @click.stop="setQuantity(ci, si, 1)"
               >1</button>
@@ -79,16 +79,16 @@ function setQuantity(ci: number, si: number, qty: number) {
                 :value="store.gameData.items[ci]![si]!.quantity"
                 @click.stop
                 @change="clampQuantity(ci, si, ($event.target as HTMLInputElement).value)"
-                class="w-10 border border-gray-300 rounded px-1 text-center text-xs"
+                class="w-10 border border-gray-700 bg-gray-800 text-amber-50 rounded px-1 text-center text-xs"
               >
               <button
-                class="text-gray-400 hover:text-indigo-600 text-xs px-0.5"
+                class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
                 title="Set quantity to 30"
                 @click.stop="setQuantity(ci, si, 30)"
               >30</button>
             </template>
             <button
-              class="text-gray-400 hover:text-red-500 text-xs px-1"
+              class="text-gray-500 hover:text-red-400 text-xs px-1"
               title="Clear slot"
               @click.stop="clearSlot(ci, si)"
             >&times;</button>

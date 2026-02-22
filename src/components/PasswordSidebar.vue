@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import { useGameDataStore } from '../stores/gameData';
-import { PasswordType, PASSWORD_CHAR_COUNTS, passwordToUrl, urlToPassword } from '../codec';
+import { PasswordType, passwordToUrl, urlToPassword } from '../codec';
 
 const store = useGameDataStore();
 
@@ -90,13 +90,13 @@ async function onPasteButton() {
 
 <template>
   <div class="space-y-4">
-    <h2 class="text-lg font-bold text-gray-800">Password</h2>
+    <h2 class="text-lg font-bold text-amber-50">Password</h2>
 
     <fieldset class="space-y-1">
       <label
         v-for="opt in typeOptions"
         :key="opt.value"
-        class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer"
+        class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer"
       >
         <input
           type="radio"
@@ -109,7 +109,7 @@ async function onPasteButton() {
     </fieldset>
 
     <div
-      class="grid grid-cols-2 grid-flow-col grid-rows-3 gap-1 rounded border border-gray-300 bg-gray-50 p-2"
+      class="grid grid-cols-2 grid-flow-col grid-rows-3 gap-1 rounded border border-gray-700 bg-gray-900 p-2"
       @paste="onPaste"
       tabindex="0"
     >
@@ -118,30 +118,30 @@ async function onPasteButton() {
         :key="i"
         class="rounded px-1.5 py-1 text-xs font-mono leading-relaxed whitespace-pre select-text"
         :class="i < activePages
-          ? 'bg-white text-gray-800'
-          : 'bg-gray-100 text-gray-300'"
+          ? 'bg-gray-800 text-amber-50'
+          : 'bg-gray-800/40 text-gray-600'"
       >
-        <span class="text-[10px] font-sans text-gray-400 block mb-0.5">{{ i + 1 }}</span><span v-text="page"></span>
+        <span class="text-[10px] font-sans text-gray-500 block mb-0.5">{{ i + 1 }}</span><span v-text="page"></span>
       </div>
     </div>
 
     <div class="flex gap-2">
       <button
         @click="onCopy"
-        class="flex-1 rounded border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+        class="flex-1 rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-300 hover:bg-gray-700 active:bg-gray-600"
       >Copy</button>
       <button
         @click="onPasteButton"
-        class="flex-1 rounded border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+        class="flex-1 rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-300 hover:bg-gray-700 active:bg-gray-600"
       >Paste</button>
     </div>
 
     <p
       v-if="store.decodeError"
-      class="text-sm text-red-600 whitespace-pre-line"
+      class="text-sm text-red-400 whitespace-pre-line"
     >{{ store.decodeError }}</p>
 
-    <hr class="border-gray-200">
+    <hr class="border-gray-700/50">
 
     <div class="space-y-2">
       <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Presets</p>
@@ -149,7 +149,7 @@ async function onPasteButton() {
         v-for="name in presets"
         :key="name"
         disabled
-        class="block w-full rounded border border-gray-300 bg-gray-100 px-3 py-2 text-left text-sm text-gray-400 cursor-not-allowed"
+        class="block w-full rounded border border-gray-700 bg-gray-800/60 px-3 py-2 text-left text-sm text-gray-600 cursor-not-allowed"
       >{{ name }}</button>
     </div>
   </div>

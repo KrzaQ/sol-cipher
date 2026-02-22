@@ -11,7 +11,7 @@ import ItemCatalog from './components/ItemCatalog.vue'
 
 <template>
   <div class="h-dvh flex flex-col overflow-y-auto lg:overflow-hidden lg:grid lg:grid-rows-[auto_1fr] lg:grid-cols-[280px_minmax(0,40rem)_280px] lg:justify-center">
-    <header class="col-span-full relative flex items-center justify-center border-b border-gray-200 bg-gray-950 px-4 py-5 overflow-hidden">
+    <header class="col-span-full relative flex items-center justify-center border-b border-gray-700 bg-gray-950 px-4 py-5 overflow-hidden">
       <SolCipherLogo :size="100" class="absolute opacity-70" />
       <h1 class="relative text-5xl tracking-widest uppercase banner-title z-10">Sol Cipher</h1>
       <div class="banner-particles" aria-hidden="true">
@@ -27,7 +27,7 @@ import ItemCatalog from './components/ItemCatalog.vue'
       <a href="https://github.com/KrzaQ/sol-cipher/" class="absolute bottom-1 right-4 text-[10px] tracking-widest uppercase text-amber-700/60 hover:text-amber-500 z-10">by KrzaQ</a>
     </header>
 
-    <aside class="border-b lg:border-b-0 lg:border-r border-gray-200 lg:overflow-y-auto p-4 lg:self-center">
+    <aside class="border-b lg:border-b-0 lg:border-r border-gray-700 lg:overflow-y-auto p-4 lg:self-center">
       <PasswordSidebar />
     </aside>
 
@@ -46,7 +46,7 @@ import ItemCatalog from './components/ItemCatalog.vue'
       </CollapsibleSection>
     </main>
 
-    <aside class="border-t lg:border-t-0 lg:border-l border-gray-200 lg:overflow-y-auto p-4 lg:self-center">
+    <aside class="border-t lg:border-t-0 lg:border-l border-gray-700 lg:overflow-y-auto p-4 lg:self-center">
       <ItemCatalog />
     </aside>
   </div>
