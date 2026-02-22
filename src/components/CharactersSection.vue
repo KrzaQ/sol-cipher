@@ -30,14 +30,14 @@ function onStatInput(charIndex: number, key: keyof CharacterStats, min: number, 
       <h3 class="text-sm font-semibold mb-2" :class="CHAR_COLORS[charIndex]!.heading">{{ name }}</h3>
       <div class="space-y-1">
         <div v-for="stat in STAT_DEFINITIONS" :key="stat.key" class="flex items-center gap-1">
-          <label class="w-14 text-xs text-gray-400 text-right shrink-0">{{ STAT_LABELS[stat.key] }}</label>
+          <label class="w-12 text-xs text-gray-400 shrink-0">{{ STAT_LABELS[stat.key] }}</label>
           <input
             type="number"
             :min="stat.min"
             :max="stat.max"
             :value="store.gameData.characters[charIndex]![stat.key]"
             @change="onStatInput(charIndex, stat.key, stat.min, stat.max, $event)"
-            class="w-full rounded border border-gray-700 bg-gray-800 text-amber-50 px-2 py-1 text-sm tabular-nums focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            class="w-3/4 rounded border border-gray-700 bg-gray-800 text-amber-50 px-1.5 py-0.5 text-sm text-right tabular-nums focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
           >
         </div>
       </div>

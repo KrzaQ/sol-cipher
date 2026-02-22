@@ -10,7 +10,15 @@ const CHARS_PER_ROW = 10;
 const ROWS_PER_PAGE = 5;
 const CHARS_PER_PAGE = CHARS_PER_ROW * ROWS_PER_PAGE;
 
-const presets = ['Story Clear', 'Completionist', 'Debug'];
+const presets = [
+  { name: 'Story Clear', password: 'n389#mrtcQwF$LXdxuZLH4HK+httqmDejh3A6K?dQUeabkwahRDFx$9BP7Pf%C#MyZnDip6T!kF&zi#7nkikf+Pq2Dv?jZi8xG&%##MA++REG3pVRcK2vD74fQdMPYWWfy533j9NzubAicZ&DL8S#YGrWFUpdvvMF#!!K+$$PaDBBV?XFSM5LL5SQQ9WUfVe3ZZi755qpcaatUeexwmjj#rpp+vGuuD!y$h$&wMNB==SFDDgXSJJ5t727!VTTcZWhgUy' },
+  { name: 'Completionist', password: 'r#aG$NHze8X7L!kN=z4RdePggG&9W3jiJRE8xbG5Rjsk9ENVb4%qRE+3HyfNPSG5fAnrdgLU$7Kpm9Dpss6HkZJFH%WghP23dDQi2&Z=euY$xMU?VS76Tt7&956HcxgY#R+&WF7sp7#!Le2WJ3zMgiS7yDZYG77JD3auH7eyM6cj&PA%=Lk2uE3ryJhV#xPc!=Tg$D2jmBJ4LRN8vjLTd!QXh$UdNNBZ8cf5bYPLah?Qem%gVsaCW6=75tu?May%+euu' },
+  { name: 'Ultimate', password: 'uHYyiXLJJBg=VPk5TteF27Gp6gcmA$b9?XjdAthhJ&qv6Du$!QCZzxRqyzz&5jADYeWb94Wr?Lv!Zz#qF!eB?=B8NkFQyzBiw52fw2KJdrVfS$Ap=JjT%i%Fs7utcHFRP9Vrm3mj%$AiQgBTrCJVMcFxb2iEMtn$9S7bdWbfhy3gkn7kqsbsrvxgvz?kzG$+r$ACvAEVH!FKM$KPBSeV7fXU7eK=Z57Q59bU9q9J#jvC5indraptsSj!zkjy#$p#TAcE' },
+];
+
+function loadPreset(password: string) {
+  store.decodePassword(password);
+}
 
 const typeOptions = [
   { value: PasswordType.Gold, label: 'Gold (260 chars)' },
@@ -146,11 +154,11 @@ async function onPasteButton() {
     <div class="space-y-2">
       <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Presets</p>
       <button
-        v-for="name in presets"
-        :key="name"
-        disabled
-        class="block w-full rounded border border-gray-700 bg-gray-800/60 px-3 py-2 text-left text-sm text-gray-600 cursor-not-allowed"
-      >{{ name }}</button>
+        v-for="preset in presets"
+        :key="preset.name"
+        @click="loadPreset(preset.password)"
+        class="block w-full rounded border border-gray-700 bg-gray-800 px-3 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 active:bg-gray-600"
+      >{{ preset.name }}</button>
     </div>
   </div>
 </template>
