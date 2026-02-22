@@ -42,9 +42,7 @@ import ItemCatalog from './components/ItemCatalog.vue'
       <CollapsibleSection title="Items">
         <ItemsSection />
       </CollapsibleSection>
-      <CollapsibleSection title="Miscellaneous">
-        <MiscSection />
-      </CollapsibleSection>
+      <MiscSection />
     </main>
 
     <aside class="border-t lg:border-t-0 lg:border-l border-gray-700 p-4 lg:sticky lg:top-0 lg:self-start">
