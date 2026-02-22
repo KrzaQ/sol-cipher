@@ -54,7 +54,7 @@ function setQuantity(ci: number, si: number, qty: number) {
     <div
       v-for="(charName, ci) in CHARACTER_NAMES"
       :key="ci"
-      class="rounded-lg p-2 cursor-pointer border border-gray-800 bg-gray-900/50"
+      class="rounded-lg p-2 cursor-pointer border border-gray-800 bg-gray-900/50 min-w-0"
       :class="store.selectedCharIndex === ci
         ? ['ring-1', CHAR_COLORS[ci]!.ring, CHAR_COLORS[ci]!.selectedBg]
         : CHAR_COLORS[ci]!.hoverBg"
@@ -74,7 +74,7 @@ function setQuantity(ci: number, si: number, qty: number) {
             <span class="flex-1 truncate text-amber-50">
               {{ TLA_ITEMS.get(store.gameData.items[ci]![si]!.itemId) ?? `#${store.gameData.items[ci]![si]!.itemId}` }}
             </span>
-            <span v-if="store.selectedCharIndex !== ci && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">×{{ store.gameData.items[ci]![si]!.quantity }}</span>
+            <span v-if="store.selectedCharIndex === null && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">{{ store.gameData.items[ci]![si]!.quantity }}</span>
             <template v-if="store.selectedCharIndex === ci">
               <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
                 <button
