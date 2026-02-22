@@ -27,7 +27,7 @@ import ItemCatalog from './components/ItemCatalog.vue'
       <a href="https://github.com/KrzaQ/sol-cipher/" class="absolute bottom-1 right-4 text-[10px] tracking-widest uppercase text-amber-700/60 hover:text-amber-500 z-10">by KrzaQ</a>
     </header>
 
-    <div class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:grid lg:grid-cols-[280px_minmax(0,40rem)_280px] lg:justify-center">
+    <div class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:grid lg:grid-cols-[224px_minmax(0,40rem)_224px] lg:justify-center">
     <aside class="border-b lg:border-b-0 lg:border-r border-gray-700 p-4 lg:sticky lg:top-0 lg:self-start">
       <PasswordSidebar />
     </aside>

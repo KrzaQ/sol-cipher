@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useGameDataStore } from '../stores/gameData';
 import {
   CHARACTER_NAMES,
@@ -32,6 +33,12 @@ function clampQuantity(ci: number, si: number, value: string) {
   store.setItem(ci, si, slot.itemId, n);
 }
 
+const itemGridCols = computed(() => {
+  const si = store.selectedCharIndex;
+  if (si === null) return 'repeat(4, 1fr)';
+  return CHARACTER_NAMES.map((_, i) => i === si ? '2fr' : '1fr').join(' ');
+});
+
 function setQuantity(ci: number, si: number, qty: number) {
   const slot = store.gameData.items[ci]![si]!;
   store.setItem(ci, si, slot.itemId, qty);
@@ -42,7 +49,7 @@ function setQuantity(ci: number, si: number, qty: number) {
   <div v-if="!store.isGold" class="text-sm text-gray-400">
     Items are only available in Gold passwords.
   </div>
-  <div v-else class="grid grid-cols-4 gap-4">
+  <div v-else class="grid gap-4" :style="{ gridTemplateColumns: itemGridCols }">
     <div
       v-for="(charName, ci) in CHARACTER_NAMES"
       :key="ci"
@@ -66,32 +73,34 @@ function setQuantity(ci: number, si: number, qty: number) {
             <span class="flex-1 truncate text-amber-50">
               {{ TLA_ITEMS.get(store.gameData.items[ci]![si]!.itemId) ?? `#${store.gameData.items[ci]![si]!.itemId}` }}
             </span>
-            <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
+            <template v-if="store.selectedCharIndex === ci">
+              <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
+                <button
+                  class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
+                  title="Set quantity to 1"
+                  @click.stop="setQuantity(ci, si, 1)"
+                >1</button>
+                <input
+                  type="number"
+                  min="1"
+                  max="30"
+                  :value="store.gameData.items[ci]![si]!.quantity"
+                  @click.stop
+                  @change="clampQuantity(ci, si, ($event.target as HTMLInputElement).value)"
+                  class="w-10 border border-gray-700 bg-gray-800 text-amber-50 rounded px-1 text-center text-xs"
+                >
+                <button
+                  class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
+                  title="Set quantity to 30"
+                  @click.stop="setQuantity(ci, si, 30)"
+                >30</button>
+              </template>
               <button
-                class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
-                title="Set quantity to 1"
-                @click.stop="setQuantity(ci, si, 1)"
-              >1</button>
-              <input
-                type="number"
-                min="1"
-                max="30"
-                :value="store.gameData.items[ci]![si]!.quantity"
-                @click.stop
-                @change="clampQuantity(ci, si, ($event.target as HTMLInputElement).value)"
-                class="w-10 border border-gray-700 bg-gray-800 text-amber-50 rounded px-1 text-center text-xs"
-              >
-              <button
-                class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
-                title="Set quantity to 30"
-                @click.stop="setQuantity(ci, si, 30)"
-              >30</button>
+                class="text-gray-500 hover:text-red-400 text-xs px-1"
+                title="Clear slot"
+                @click.stop="clearSlot(ci, si)"
+              >&times;</button>
             </template>
-            <button
-              class="text-gray-500 hover:text-red-400 text-xs px-1"
-              title="Clear slot"
-              @click.stop="clearSlot(ci, si)"
-            >&times;</button>
           </template>
         </div>
       </div>
