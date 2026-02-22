@@ -86,13 +86,26 @@ function onPaste(e: ClipboardEvent) {
   store.decodePassword(text);
 }
 
+function formatForCopy(raw: string): string {
+  const lines: string[] = [];
+  for (let i = 0; i < raw.length; i += CHARS_PER_ROW) {
+    const row = raw.slice(i, i + CHARS_PER_ROW);
+    lines.push(row.slice(0, 5) + ' ' + row.slice(5));
+    if ((lines.length % ROWS_PER_PAGE) === 0 && i + CHARS_PER_ROW < raw.length) {
+      lines.push('');
+    }
+  }
+  return lines.join('\n');
+}
+
 async function onCopy() {
+  const text = formatForCopy(store.generatedPassword);
   try {
-    await navigator.clipboard.writeText(store.generatedPassword);
+    await navigator.clipboard.writeText(text);
   } catch {
     // Fallback for non-HTTPS contexts
     const ta = document.createElement('textarea');
-    ta.value = store.generatedPassword;
+    ta.value = text;
     ta.style.position = 'fixed';
     ta.style.opacity = '0';
     document.body.appendChild(ta);
