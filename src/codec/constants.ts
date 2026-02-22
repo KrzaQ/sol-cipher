@@ -115,6 +115,86 @@ export const QUANTITY_ITEM_IDS: readonly number[] = [
   0xF1, // Crystal Powder
 ];
 
+// All psynergy-granting items (GS1 + TLA)
+export const PSYNERGY_ITEM_IDS: readonly number[] = [
+  // GS1 (same as SPECIAL_ITEM_IDS)
+  0xC8, // Orb of Force
+  0xC9, // Douse Drop
+  0xCA, // Frost Jewel
+  0xCB, // Lifting Gem
+  0xCC, // Halt Gem
+  0xCD, // Cloak Ball
+  0xCE, // Carry Stone
+  0xCF, // Catch Beads
+  // TLA-exclusive
+  0xC6, // Lash Pebble
+  0xC7, // Pound Cube
+  0xD0, // Tremor Bit
+  0xD1, // Scoop Gem
+  0xD2, // Cyclone Chip
+  0xD5, // Burst Brooch
+  0xD6, // Grindstone
+  0xD7, // Hover Jade
+  0xD9, // Teleport Lapis
+];
+
+// Story/key items (stars, keys, unique plot items)
+export const KEY_ITEM_IDS: readonly number[] = [
+  // GS1 Story Items
+  0xDC, // Venus Star
+  0xDD, // Mercury Star
+  0xDE, // Mars Star
+  0xDF, // Jupiter Star
+  0xE0, // Mythril Bag
+  0xE1, // Small Jewel
+  // GS1 Unique Battle/Utility (non-stackable, key-like)
+  0xE6, // Dragon's Eye
+  0xE7, // Bone
+  0xE8, // Anchor Charm
+  0xE9, // Corn
+  0xEA, // Cell Key
+  0xEB, // Boat Ticket
+  0xED, // Mystic Draught
+  0xF2, // Black Orb / Black Crystal
+  0xF3, // Red Key
+  0xF4, // Blue Key
+  // TLA Story Items
+  0xF5, // Mythril Bag
+  0xF6, // Jupiter Star
+  0xF7, // Mars Star
+];
+
+// TLA quest/side items (trident pieces, fetch quest items)
+export const QUEST_ITEM_IDS: readonly number[] = [
+  // Trident Pieces
+  0x1B7, // Right Prong
+  0x1B8, // Left Prong
+  0x1B9, // Center Prong
+  // Quest Items
+  0x1C0, // Healing Fungus
+  0x1C1, // Laughing Fungus
+  0x1C2, // Signal Whistle
+  0x1C3, // Dancing Idol
+  0x1C4, // Pretty Stone
+  0x1C5, // Red Cloth
+  0x1C6, // Milk
+  0x1C7, // Li'l Turtle
+  0x1C8, // Aquarius Stone
+  0x1C9, // Large Bread
+  0x1CA, // Sea God's Tear
+  0x1CB, // Ruin Key
+  0x1CC, // Magma Ball
+];
+
+// Items required for TLA completion (must be present in Gold passwords)
+export const REQUIRED_ITEM_IDS: readonly number[] = [
+  0xDE, // Mars Star (GS1) / Mythril Bag (TLA)
+  0xF2, // Black Orb (GS1) / Black Crystal (TLA)
+];
+
+// Highest item ID that exists in GS1 (Cleric's Ring)
+export const MAX_GS1_ITEM_ID = 0x010C;
+
 // --- H. Stat definitions ---
 
 export interface StatDefinition {

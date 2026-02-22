@@ -1,10 +1,26 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useGameDataStore } from '../stores/gameData';
-import { TLA_ITEMS } from '../codec';
+import {
+  TLA_ITEMS,
+  QUANTITY_ITEM_IDS,
+  PSYNERGY_ITEM_IDS,
+  KEY_ITEM_IDS,
+  REQUIRED_ITEM_IDS,
+  QUEST_ITEM_IDS,
+  MAX_GS1_ITEM_ID,
+  CROSS_GAME_DIFFERENCES,
+} from '../codec';
 
 const store = useGameDataStore();
 const search = ref('');
+
+const QUANTITY_SET = new Set(QUANTITY_ITEM_IDS);
+const PSYNERGY_SET = new Set(PSYNERGY_ITEM_IDS);
+const KEY_SET = new Set(KEY_ITEM_IDS);
+const REQUIRED_SET = new Set(REQUIRED_ITEM_IDS);
+const QUEST_SET = new Set(QUEST_ITEM_IDS);
+const CROSS_GAME_MAP = new Map(CROSS_GAME_DIFFERENCES.map(d => [d.id, d.gs1Name]));
 
 // All items except (empty) id=0
 const allItems = computed(() => {
@@ -22,23 +38,40 @@ const filteredItems = computed(() => {
   return allItems.value.filter(item => item.name.toLowerCase().includes(q));
 });
 
-// Set of item IDs held by the currently selected character
-const heldItemIds = computed<Set<number>>(() => {
+// Only stackable items held by the selected character should be blocked
+// (equipment can be added multiple times)
+const heldQuantityIds = computed<Set<number>>(() => {
   if (store.selectedCharIndex === null) return new Set();
   const charItems = store.gameData.items[store.selectedCharIndex]!;
   const ids = new Set<number>();
   for (const slot of charItems) {
-    if (slot.itemId !== 0) ids.add(slot.itemId);
+    if (slot.itemId !== 0 && QUANTITY_SET.has(slot.itemId)) ids.add(slot.itemId);
   }
   return ids;
 });
 
+// Check if inventory is full (no empty slots)
+const inventoryFull = computed(() => {
+  if (store.selectedCharIndex === null) return false;
+  const charItems = store.gameData.items[store.selectedCharIndex]!;
+  return charItems.every(slot => slot.itemId !== 0);
+});
+
 const hasSelection = computed(() => store.selectedCharIndex !== null);
 
+function isDisabled(itemId: number): boolean {
+  if (!hasSelection.value) return true;
+  if (inventoryFull.value) return true;
+  return heldQuantityIds.value.has(itemId);
+}
+
 function pickItem(itemId: number) {
-  if (!hasSelection.value) return;
-  if (heldItemIds.value.has(itemId)) return;
+  if (isDisabled(itemId)) return;
   store.assignItem(itemId);
+}
+
+function gs1Name(itemId: number): string | undefined {
+  return CROSS_GAME_MAP.get(itemId);
 }
 </script>
 
@@ -62,16 +95,23 @@ function pickItem(itemId: number) {
         v-for="item in filteredItems"
         :key="item.id"
         type="button"
-        class="block w-full text-left px-2 py-1 text-sm rounded"
+        class="flex items-center gap-1 w-full text-left px-2 py-1 text-sm rounded"
         :class="
-          !hasSelection || heldItemIds.has(item.id)
+          isDisabled(item.id)
             ? 'text-gray-600 cursor-default'
             : 'text-amber-50 hover:bg-amber-900/30 cursor-pointer'
         "
-        :disabled="!hasSelection || heldItemIds.has(item.id)"
+        :disabled="isDisabled(item.id)"
+        :title="gs1Name(item.id) ? `Called '${gs1Name(item.id)}' in GS1` : undefined"
         @click="pickItem(item.id)"
       >
-        {{ item.name }}
+        <span class="truncate">{{ item.name }}</span>
+        <span v-if="gs1Name(item.id)" class="shrink-0 text-[10px] font-semibold text-orange-400" :title="`Called '${gs1Name(item.id)}' in GS1`">GS1</span>
+        <span v-if="REQUIRED_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-red-400" title="Required for TLA completion">Req</span>
+        <span v-if="PSYNERGY_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
+        <span v-if="KEY_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
+        <span v-if="QUEST_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
+        <span v-if="item.id > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
       </button>
     </div>
   </div>
