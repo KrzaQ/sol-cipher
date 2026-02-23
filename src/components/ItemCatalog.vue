@@ -99,24 +99,30 @@ function gs1Name(itemId: number): string | undefined {
         v-for="item in filteredItems"
         :key="item.id"
         type="button"
-        class="flex items-center gap-1 w-full text-left px-2 py-1 text-sm rounded"
+        class="w-full text-left px-2 py-1 text-sm rounded"
         :class="
           isDisabled(item.id)
             ? 'text-gray-600 cursor-default'
             : 'text-amber-50 hover:bg-amber-900/30 cursor-pointer'
         "
         :disabled="isDisabled(item.id)"
-        :title="gs1Name(item.id) ? `Called '${gs1Name(item.id)}' in GS1` : undefined"
         @click="pickItem(item.id)"
       >
-        <span class="truncate">{{ item.name }}</span>
-        <span v-if="gs1Name(item.id)" class="shrink-0 text-[10px] font-semibold text-orange-400" :title="`Called '${gs1Name(item.id)}' in GS1`">GS1</span>
-        <span v-if="REQUIRED_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-red-400" title="Required for TLA completion">Req</span>
-        <span v-if="PSYNERGY_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
-        <span v-if="KEY_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
-        <span v-if="QUEST_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
-        <span v-if="item.id > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
-        <span v-if="RUSTY_FORGE_MAP.has(item.id)" class="shrink-0 text-[10px] font-semibold text-pink-400" :title="`Forges into ${RUSTY_FORGE_MAP.get(item.id)}`">Forge</span>
+        <div class="flex items-center gap-1">
+          <span class="truncate">{{ item.name }}</span>
+          <span v-if="gs1Name(item.id)" class="shrink-0 text-[10px] font-semibold text-orange-400">GS1</span>
+          <span v-if="REQUIRED_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-red-400">Req</span>
+          <span v-if="PSYNERGY_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
+          <span v-if="KEY_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
+          <span v-if="QUEST_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
+          <span v-if="item.id > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
+          <span v-if="RUSTY_FORGE_MAP.has(item.id)" class="shrink-0 text-[10px] font-semibold text-pink-400">Forge</span>
+        </div>
+        <div v-if="gs1Name(item.id) || RUSTY_FORGE_MAP.has(item.id)" class="text-[11px] text-gray-500 pl-1">
+          <span v-if="gs1Name(item.id)">GS1: {{ gs1Name(item.id) }}</span>
+          <span v-if="gs1Name(item.id) && RUSTY_FORGE_MAP.has(item.id)"> · </span>
+          <span v-if="RUSTY_FORGE_MAP.has(item.id)">Forges into {{ RUSTY_FORGE_MAP.get(item.id) }}</span>
+        </div>
       </button>
     </div>
   </div>
