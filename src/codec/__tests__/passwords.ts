@@ -42,11 +42,25 @@ export const ULTIMATE = {
   coins: 999999,
 };
 
-/** All 8 real-world password strings for bulk testing. */
+// --- krzaq's original save ---
+// Level 35/34/34/34, all 28 djinn, 527690 coins
+export const KRZAQ_ORIGINAL = {
+  gold: 'VsuiNqS3nTqeWsFYFj$sfUXHPLVsUEreY8m+5?yrAM#2zevb3LFjPr$2fVYbV#JDnZ2Us#QUq8zgcC&7mhH+6xyC8dq7D7A8P$!93UB%7YFBfNxtABLsE6XMM%X!ZVvn582!tappRecfD&D#SzaCKuDuqQHyuUMu&zZS=&5WDkAa3JEe7NJrjcTPpgXTt2m4Yyr7U#vTd9=!hdD$mUiJBsnNFwsZTL?x7Q%?3JVC+8ZGCc5CMHhaPMy8V%Ssj2Wxh6Uw',
+  stats: {
+    isaac: { level: 35, hpMax: 303, ppMax: 135, attack: 152, defense: 63, agility: 145, luck: 9 },
+    garet: { level: 34, hpMax: 304, ppMax: 114, attack: 131, defense: 63, agility: 122, luck: 2 },
+    ivan:  { level: 34, hpMax: 288, ppMax: 134, attack: 125, defense: 61, agility: 148, luck: 4 },
+    mia:   { level: 34, hpMax: 270, ppMax: 127, attack: 133, defense: 61, agility: 133, luck: 5 },
+  },
+  coins: 527690,
+};
+
+/** All real-world password strings for bulk testing. */
 export const ALL_PASSWORDS: string[] = [
   LEVEL_36.gold, LEVEL_36.silver, LEVEL_36.bronze,
   LEVEL_48.gold, LEVEL_48.silver, LEVEL_48.bronze,
   ULTIMATE.gold,
+  KRZAQ_ORIGINAL.gold,
 ];
 
 export function verifyStats(result: GameData, expected: typeof LEVEL_36.stats) {

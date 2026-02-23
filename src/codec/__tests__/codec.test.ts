@@ -7,7 +7,7 @@ import { deserializeGameData } from '../deserialize';
 import { bytesToPasswordChars, passwordCharsToBytes, charToIndex } from '../scramble';
 import { PasswordType, ALPHABET, PASSWORD_CHAR_COUNTS } from '../constants';
 import type { GameData } from '../types';
-import { LEVEL_36, LEVEL_48, ULTIMATE, verifyStats } from './passwords';
+import { LEVEL_36, LEVEL_48, ULTIMATE, KRZAQ_ORIGINAL, verifyStats } from './passwords';
 
 // --- Test data from Paulygon screenshots ---
 function makeScreenshotGameData(): GameData {
@@ -573,6 +573,46 @@ describe('real-world passwords — Level 48 save', () => {
 
     const reencoded = encode(result.data, PasswordType.Bronze);
     expect(reencoded).toBe(LEVEL_48.bronze);
+  });
+});
+
+describe('real-world passwords — krzaq original save', () => {
+  it('decodes Gold password and verifies all fields', () => {
+    const result = decode(KRZAQ_ORIGINAL.gold, PasswordType.Gold);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    verifyStats(result.data, KRZAQ_ORIGINAL.stats);
+    expect(result.data.djinn).toEqual([0x7F, 0x7F, 0x7F, 0x7F]);
+    expect(result.data.flags).toBe(0x2B);
+    expect(result.data.coins).toBe(KRZAQ_ORIGINAL.coins);
+
+    // Isaac: Gaia Blade, Dragon Helm, Vambrace, Dragon Scales, Cloak Ball,
+    //        Lifting Gem, Frost Jewel, Catch Beads, Zodiac Wand, Blessed Mace
+    expect(result.data.items[0]![0]!.itemId).toBe(0x09);  // Gaia Blade
+    expect(result.data.items[0]![3]!.itemId).toBe(0x52);  // Dragon Scales
+    expect(result.data.items[0]![8]!.itemId).toBe(0x10C); // Zodiac Wand
+
+    // Garet: Kikuichimonji, ..., Lucky Medal x12, Mythril Bag
+    expect(result.data.items[1]![0]!.itemId).toBe(0x19);  // Kikuichimonji
+    expect(result.data.items[1]![5]!.itemId).toBe(0xE5);  // Lucky Medal
+    expect(result.data.items[1]![5]!.quantity).toBe(12);
+    expect(result.data.items[1]![6]!.itemId).toBe(0xDE);  // Mythril Bag
+
+    // Mia: Blessed Mace, ..., Weasel's Claw, Nut x2, Black Crystal
+    expect(result.data.items[3]![0]!.itemId).toBe(0x31);  // Blessed Mace
+    expect(result.data.items[3]![7]!.itemId).toBe(0xB5);  // Nut
+    expect(result.data.items[3]![7]!.quantity).toBe(2);
+    expect(result.data.items[3]![8]!.itemId).toBe(0xF2);  // Black Crystal
+  });
+
+  it('round-trips Gold: encode(decode(pw)) === pw', () => {
+    const result = decode(KRZAQ_ORIGINAL.gold, PasswordType.Gold);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    const reencoded = encode(result.data, PasswordType.Gold);
+    expect(reencoded).toBe(KRZAQ_ORIGINAL.gold);
   });
 });
 
