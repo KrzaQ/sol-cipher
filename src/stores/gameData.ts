@@ -18,6 +18,7 @@ interface GameDataState {
   generatedPassword: string;
   lastValidPassword: string;
   decodeError: string;
+  decodeErrorGroups: number[];
   selectedCharIndex: number | null;
 }
 
@@ -28,6 +29,7 @@ export const useGameDataStore = defineStore('gameData', {
     generatedPassword: '',
     lastValidPassword: '',
     decodeError: '',
+    decodeErrorGroups: [],
     selectedCharIndex: null,
   }),
 
@@ -61,6 +63,7 @@ export const useGameDataStore = defineStore('gameData', {
 
     generatePassword() {
       this.decodeError = '';
+      this.decodeErrorGroups = [];
       this.generatedPassword = encode(this.gameData, this.passwordType);
       this.lastValidPassword = this.generatedPassword;
     },
@@ -74,9 +77,11 @@ export const useGameDataStore = defineStore('gameData', {
         this.gameData = result.data;
         this.passwordType = result.passwordType;
         this.decodeError = '';
+        this.decodeErrorGroups = [];
         this.selectedCharIndex = null;
       } else {
         this.decodeError = result.error;
+        this.decodeErrorGroups = result.errorGroups ?? [];
       }
     },
 

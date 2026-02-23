@@ -67,9 +67,58 @@ export function bytesToPasswordChars(buf: Uint8Array): number[] {
   return chars;
 }
 
+/**
+ * Validate checksum groups on a (possibly partial) password.
+ * Each group is 10 chars: 9 data + 1 check. Returns 0-indexed group
+ * indices that have checksum mismatches. Only complete groups are checked.
+ * Input is raw alphabet characters (not yet converted to indices).
+ */
+export function validateChecksums(password: string): number[] {
+  // Convert to 6-bit indices
+  const chars: number[] = [];
+  for (const ch of password) {
+    const idx = charToIndex(ch);
+    if (idx === INVALID_CHAR_INDEX) continue;
+    chars.push(idx);
+  }
+
+  // Reverse position offset
+  for (let i = 0; i < chars.length; i++) {
+    let v = chars[i]! - (i & 0x3F);
+    if (v < 0) v += 0x40;
+    chars[i] = v & 0x3F;
+  }
+
+  return verifyCheckGroups(chars);
+}
+
+/** Check every complete 10-char group and return failing group indices. */
+function verifyCheckGroups(chars: number[]): number[] {
+  const errors: number[] = [];
+  const charCount = chars.length;
+  const groupCount = Math.floor(charCount / 10) + 1;
+  for (let group = 0; group < groupCount; group++) {
+    const start = group * 10;
+    let checkSum = 0;
+    let pos = start;
+    let count = 0;
+    while (count < 9) {
+      if (pos >= charCount) break;
+      checkSum += chars[pos]!;
+      pos++;
+      count++;
+    }
+    if (pos >= charCount) break;
+    if (chars[start + 9] !== (checkSum & 0x3F)) {
+      errors.push(group);
+    }
+  }
+  return errors;
+}
+
 export type CharsToByteResult =
   | { ok: true; data: Uint8Array }
-  | { ok: false; error: string };
+  | { ok: false; error: string; errorGroups: number[] };
 
 /**
  * Convert array of 6-bit password character indices back to byte buffer.
@@ -86,31 +135,18 @@ export function passwordCharsToBytes(inputChars: number[], charCount: number): C
     chars[i] = v & 0x3F;
   }
 
-  // Step 2: Verify check bytes (every 10th char is checksum of preceding 9)
-  const errors: string[] = [];
-  const groupCount = Math.floor(charCount / 10) + 1;
-  for (let group = 0; group < groupCount; group++) {
-    const start = group * 10;
-    let checkSum = 0;
-    let pos = start;
-    let count = 0;
-    while (count < 9) {
-      if (pos >= charCount) break;
-      checkSum += chars[pos]!;
-      pos++;
-      count++;
-    }
-    if (pos >= charCount) break;
-    if (chars[start + 9] !== (checkSum & 0x3F)) {
-      errors.push(`page ${group + 1}, row ${count + 1}`);
-    }
-  }
-
+  // Step 2: Verify check bytes
+  const errors = verifyCheckGroups(chars);
   if (errors.length > 0) {
-    const detail = errors.join(', ');
+    const detail = errors.map(g => {
+      const page = Math.floor(g / 5) + 1;
+      const row = (g % 5) + 1;
+      return `page ${page}, row ${row}`;
+    }).join('; ');
     return {
       ok: false,
-      error: `There is at least one mistake in each of the following:\n${detail}`,
+      error: `At least one wrong character in: ${detail}`,
+      errorGroups: errors,
     };
   }
 
@@ -145,7 +181,7 @@ export function passwordCharsToBytes(inputChars: number[], charCount: number): C
   // Step 4: Determine expected byte count from char count
   const pwType = CHAR_COUNT_TO_TYPE.get(charCount);
   if (pwType === undefined) {
-    return { ok: false, error: 'Password has an incorrect number of characters.' };
+    return { ok: false, error: 'Password has an incorrect number of characters.', errorGroups: [] };
   }
   const byteCount = PASSWORD_TOTAL_BYTES[pwType];
 

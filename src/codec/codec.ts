@@ -8,7 +8,7 @@ import { charToIndex, bytesToPasswordChars, passwordCharsToBytes } from './scram
 
 export type DecodeResult =
   | { ok: true; data: GameData; passwordType: PasswordType }
-  | { ok: false; error: string };
+  | { ok: false; error: string; errorGroups?: number[] };
 
 /**
  * Encode game data into a password string.
@@ -69,7 +69,7 @@ export function decode(password: string, passwordType?: PasswordType): DecodeRes
   // Step 2: Reverse scramble → byte buffer
   const unscrambleResult = passwordCharsToBytes(chars, charCount);
   if (!unscrambleResult.ok) {
-    return { ok: false, error: unscrambleResult.error };
+    return { ok: false, error: unscrambleResult.error, errorGroups: unscrambleResult.errorGroups };
   }
   const buf = unscrambleResult.data;
   const byteCount = buf.length;
