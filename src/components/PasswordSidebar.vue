@@ -72,12 +72,10 @@ watch(() => store.generatedPassword, (pw) => {
   history.replaceState(null, '', '#' + passwordToUrl(pw));
 });
 
-// On mount: decode password from URL hash if present
+// On mount: decode password from URL hash, or load Story Clear as default
 onMounted(() => {
   const hash = window.location.hash.slice(1);
-  if (hash) {
-    store.decodePassword(urlToPassword(hash));
-  }
+  store.decodePassword(hash ? urlToPassword(hash) : presets[0]!.password);
 });
 
 function onPaste(e: ClipboardEvent) {
