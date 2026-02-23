@@ -11,6 +11,7 @@ import {
   QUEST_ITEM_IDS,
   MAX_GS1_ITEM_ID,
   CROSS_GAME_DIFFERENCES,
+  RUSTY_FORGE_MAP,
   SPECIAL_ITEM_IDS,
   TLA_ITEMS,
   type ItemSlot,
@@ -196,6 +197,7 @@ function onItemAdded(ci: number, si: number) {
               <span v-if="KEY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
               <span v-if="QUEST_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
               <span v-if="store.gameData.items[ci]![si]!.itemId > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
+              <span v-if="RUSTY_FORGE_MAP.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-pink-400" :title="`Forges into ${RUSTY_FORGE_MAP.get(store.gameData.items[ci]![si]!.itemId)}`">Forge</span>
               <span v-if="!isExpanded(ci) && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">{{ store.gameData.items[ci]![si]!.quantity }}</span>
               <template v-if="isExpanded(ci)">
                 <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">

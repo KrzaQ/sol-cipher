@@ -195,7 +195,23 @@ export const REQUIRED_ITEM_IDS: readonly number[] = [
 // Highest item ID that exists in GS1 (Cleric's Ring)
 export const MAX_GS1_ITEM_ID = 0x010C;
 
-// --- H. Stat definitions ---
+// --- H. Rusty item forge results ---
+
+export const RUSTY_FORGE_MAP: ReadonlyMap<number, string> = new Map([
+  [0x1A1, 'Robber\'s Blade'],
+  [0x1A2, 'Soul Brand'],
+  [0x1A3, 'Corsair\'s Edge'],
+  [0x1A4, 'Pirate\'s Sabre'],
+  [0x1A5, 'Captain\'s Axe'],
+  [0x1A6, 'Viking Axe'],
+  [0x1A7, 'Demon Mace'],
+  [0x1A8, 'Hagbone Mace'],
+  [0x1A9, 'Dracomace'],
+  [0x1AA, 'Glower Staff'],
+  [0x1AB, 'Goblin\'s Rod'],
+]);
+
+// --- I. Stat definitions ---
 
 export interface StatDefinition {
   readonly key: keyof CharacterStats;
@@ -214,7 +230,7 @@ export const STAT_DEFINITIONS: readonly StatDefinition[] = [
   { key: 'luck', bits: 7, min: 0, max: 99 },
 ];
 
-// --- I. Codec constants ---
+// --- J. Codec constants ---
 
 export const ITEMS_PER_CHARACTER = 15;
 export const ITEM_ID_BITS = 9;
@@ -226,7 +242,7 @@ export const CHECK_CHAR_INTERVAL = 9;
 export const BITS_PER_CHAR = 6;
 export const STATS_BYTES_PER_PAIR = 15;
 
-// --- J. Cross-game differences ---
+// --- K. Cross-game differences ---
 
 export interface CrossGameDifference {
   readonly id: number;

@@ -10,6 +10,7 @@ import {
   QUEST_ITEM_IDS,
   MAX_GS1_ITEM_ID,
   CROSS_GAME_DIFFERENCES,
+  RUSTY_FORGE_MAP,
 } from '../codec';
 
 const emit = defineEmits<{ itemAdded: [charIndex: number, slotIndex: number] }>();
@@ -115,6 +116,7 @@ function gs1Name(itemId: number): string | undefined {
         <span v-if="KEY_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
         <span v-if="QUEST_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
         <span v-if="item.id > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
+        <span v-if="RUSTY_FORGE_MAP.has(item.id)" class="shrink-0 text-[10px] font-semibold text-pink-400" :title="`Forges into ${RUSTY_FORGE_MAP.get(item.id)}`">Forge</span>
       </button>
     </div>
   </div>

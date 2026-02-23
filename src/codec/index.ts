@@ -26,6 +26,7 @@ export {
   QUEST_ITEM_IDS,
   MAX_GS1_ITEM_ID,
   CROSS_GAME_DIFFERENCES,
+  RUSTY_FORGE_MAP,
   PASSWORD_CHAR_COUNTS,
 } from './constants';
 export type { EventFlag, StatDefinition, CrossGameDifference } from './constants';
