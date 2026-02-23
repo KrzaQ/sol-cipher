@@ -173,7 +173,6 @@ export const QUEST_ITEM_IDS: readonly number[] = [
   // Quest Items
   0x1C0, // Healing Fungus
   0x1C1, // Laughing Fungus
-  0x1C2, // Signal Whistle
   0x1C3, // Dancing Idol
   0x1C4, // Pretty Stone
   0x1C5, // Red Cloth
@@ -194,6 +193,20 @@ export const REQUIRED_ITEM_IDS: readonly number[] = [
 
 // Highest item ID that exists in GS1 (Cleric's Ring)
 export const MAX_GS1_ITEM_ID = 0x010C;
+
+// Items coded into TLA but unobtainable without hacking (planned Lucky Wheels prizes)
+export const UNOBTAINABLE_ITEM_IDS: readonly number[] = [
+  0x018E, // Divine Camisole
+  0x018F, // Herbed Shirt
+  0x0191, // Casual Shirt
+  0x0195, // Knight's Greave
+  0x0196, // Silver Greave
+  0x0197, // Ninja Sandals
+  0x019B, // Aroma Ring
+  0x019C, // Rainbow Ring
+  0x019D, // Soul Ring
+  0x01C2, // Signal Whistle (enemy-only, used by Briggs)
+];
 
 // --- H. Rusty item forge results ---
 

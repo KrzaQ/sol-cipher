@@ -12,6 +12,7 @@ import {
   MAX_GS1_ITEM_ID,
   CROSS_GAME_DIFFERENCES,
   RUSTY_FORGE_MAP,
+  UNOBTAINABLE_ITEM_IDS,
   SPECIAL_ITEM_IDS,
   TLA_ITEMS,
   type ItemSlot,
@@ -36,6 +37,7 @@ const PSYNERGY_SET = new Set(PSYNERGY_ITEM_IDS);
 const KEY_SET = new Set(KEY_ITEM_IDS);
 const REQUIRED_SET = new Set(REQUIRED_ITEM_IDS);
 const QUEST_SET = new Set(QUEST_ITEM_IDS);
+const UNOBTAINABLE_SET = new Set(UNOBTAINABLE_ITEM_IDS);
 const CROSS_GAME_MAP = new Map(CROSS_GAME_DIFFERENCES.map(d => [d.id, d.gs1Name]));
 const SLOT_INDICES = Array.from({ length: ITEMS_PER_CHARACTER }, (_, i) => i);
 
@@ -124,7 +126,7 @@ function isExpanded(ci: number): boolean {
   return store.selectedCharIndex === ci;
 }
 
-type Badge = 'Req' | 'Forge' | 'Psy' | 'Key' | 'GS1' | 'TLA' | 'Quest';
+type Badge = 'Req' | 'Forge' | 'Psy' | 'Key' | 'GS1' | 'Unused' | 'TLA' | 'Quest';
 
 function topBadge(itemId: number): Badge | null {
   if (REQUIRED_SET.has(itemId)) return 'Req';
@@ -132,6 +134,7 @@ function topBadge(itemId: number): Badge | null {
   if (PSYNERGY_SET.has(itemId)) return 'Psy';
   if (KEY_SET.has(itemId)) return 'Key';
   if (CROSS_GAME_MAP.has(itemId)) return 'GS1';
+  if (UNOBTAINABLE_SET.has(itemId)) return 'Unused';
   if (itemId > MAX_GS1_ITEM_ID) return 'TLA';
   if (QUEST_SET.has(itemId)) return 'Quest';
   return null;
@@ -212,6 +215,7 @@ function onItemAdded(ci: number, si: number) {
                     <span v-if="PSYNERGY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
                     <span v-if="KEY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
                     <span v-if="QUEST_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
+                    <span v-if="UNOBTAINABLE_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-gray-400" title="Unobtainable in normal gameplay">Unused</span>
                     <span v-if="store.gameData.items[ci]![si]!.itemId > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
                     <span v-if="RUSTY_FORGE_MAP.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-pink-400">Forge</span>
                   </template>
@@ -221,14 +225,16 @@ function onItemAdded(ci: number, si: number) {
                     <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'Psy'" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
                     <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'Key'" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
                     <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'GS1'" class="shrink-0 text-[10px] font-semibold text-orange-400">GS1</span>
+                    <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'Unused'" class="shrink-0 text-[10px] font-semibold text-gray-400" title="Unobtainable in normal gameplay">Unused</span>
                     <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'TLA'" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
                     <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'Quest'" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
                   </template>
                 </div>
-                <div v-if="isExpanded(ci) && (CROSS_GAME_MAP.has(store.gameData.items[ci]![si]!.itemId) || RUSTY_FORGE_MAP.has(store.gameData.items[ci]![si]!.itemId))" class="text-[11px] text-gray-500">
+                <div v-if="isExpanded(ci) && (CROSS_GAME_MAP.has(store.gameData.items[ci]![si]!.itemId) || RUSTY_FORGE_MAP.has(store.gameData.items[ci]![si]!.itemId) || UNOBTAINABLE_SET.has(store.gameData.items[ci]![si]!.itemId))" class="text-[11px] text-gray-500">
                   <span v-if="CROSS_GAME_MAP.has(store.gameData.items[ci]![si]!.itemId)">GS1: {{ CROSS_GAME_MAP.get(store.gameData.items[ci]![si]!.itemId) }}</span>
-                  <span v-if="CROSS_GAME_MAP.has(store.gameData.items[ci]![si]!.itemId) && RUSTY_FORGE_MAP.has(store.gameData.items[ci]![si]!.itemId)"> · </span>
+                  <span v-if="CROSS_GAME_MAP.has(store.gameData.items[ci]![si]!.itemId) && (RUSTY_FORGE_MAP.has(store.gameData.items[ci]![si]!.itemId) || UNOBTAINABLE_SET.has(store.gameData.items[ci]![si]!.itemId))"> · </span>
                   <span v-if="RUSTY_FORGE_MAP.has(store.gameData.items[ci]![si]!.itemId)">Forges into {{ RUSTY_FORGE_MAP.get(store.gameData.items[ci]![si]!.itemId) }}</span>
+                  <span v-if="UNOBTAINABLE_SET.has(store.gameData.items[ci]![si]!.itemId)">Unobtainable in normal gameplay</span>
                 </div>
               </div>
               <span v-if="!isExpanded(ci) && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">{{ store.gameData.items[ci]![si]!.quantity }}</span>

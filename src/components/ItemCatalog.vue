@@ -11,6 +11,7 @@ import {
   MAX_GS1_ITEM_ID,
   CROSS_GAME_DIFFERENCES,
   RUSTY_FORGE_MAP,
+  UNOBTAINABLE_ITEM_IDS,
 } from '../codec';
 
 const emit = defineEmits<{ itemAdded: [charIndex: number, slotIndex: number] }>();
@@ -24,6 +25,7 @@ const KEY_SET = new Set(KEY_ITEM_IDS);
 const REQUIRED_SET = new Set(REQUIRED_ITEM_IDS);
 const QUEST_SET = new Set(QUEST_ITEM_IDS);
 const CROSS_GAME_MAP = new Map(CROSS_GAME_DIFFERENCES.map(d => [d.id, d.gs1Name]));
+const UNOBTAINABLE_SET = new Set(UNOBTAINABLE_ITEM_IDS);
 
 // All items except (empty) id=0
 const allItems = computed(() => {
@@ -115,13 +117,15 @@ function gs1Name(itemId: number): string | undefined {
           <span v-if="PSYNERGY_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
           <span v-if="KEY_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
           <span v-if="QUEST_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
+          <span v-if="UNOBTAINABLE_SET.has(item.id)" class="shrink-0 text-[10px] font-semibold text-gray-400" title="Unobtainable in normal gameplay">Unused</span>
           <span v-if="item.id > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
           <span v-if="RUSTY_FORGE_MAP.has(item.id)" class="shrink-0 text-[10px] font-semibold text-pink-400">Forge</span>
         </div>
-        <div v-if="gs1Name(item.id) || RUSTY_FORGE_MAP.has(item.id)" class="text-[11px] text-gray-500 pl-1">
+        <div v-if="gs1Name(item.id) || RUSTY_FORGE_MAP.has(item.id) || UNOBTAINABLE_SET.has(item.id)" class="text-[11px] text-gray-500 pl-1">
           <span v-if="gs1Name(item.id)">GS1: {{ gs1Name(item.id) }}</span>
-          <span v-if="gs1Name(item.id) && RUSTY_FORGE_MAP.has(item.id)"> · </span>
+          <span v-if="gs1Name(item.id) && (RUSTY_FORGE_MAP.has(item.id) || UNOBTAINABLE_SET.has(item.id))"> · </span>
           <span v-if="RUSTY_FORGE_MAP.has(item.id)">Forges into {{ RUSTY_FORGE_MAP.get(item.id) }}</span>
+          <span v-if="UNOBTAINABLE_SET.has(item.id)">Unobtainable in normal gameplay</span>
         </div>
       </button>
     </div>
