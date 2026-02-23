@@ -46,6 +46,10 @@ import ItemCatalog from './components/ItemCatalog.vue'
     <aside class="hidden lg:block lg:border-l border-gray-700 p-4 lg:sticky lg:top-0 lg:self-start">
       <ItemCatalog />
     </aside>
+
+    <footer class="lg:col-span-3 border-t border-gray-700 bg-gray-950 px-4 py-3 text-center text-xs text-gray-600">
+      © 2026 <a href="https://github.com/KrzaQ/sol-cipher/" class="text-gray-500 hover:text-amber-500">KrzaQ</a> · Sol Cipher
+    </footer>
     </div>
   </div>
 </template>
