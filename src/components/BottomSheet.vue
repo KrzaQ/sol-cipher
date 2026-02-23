@@ -36,22 +36,19 @@ onUnmounted(() => {
   }
 });
 
-// --- Swipe to close ---
-const scrollRef = ref<HTMLElement | null>(null);
+// --- Swipe to close (handle bar only) ---
 const dragY = ref(0);
-const dragging = ref(false);
+let dragging = false;
 let startY = 0;
 
-function onTouchStart(e: TouchEvent) {
-  // Only start swipe if scroll is at top
-  if (scrollRef.value && scrollRef.value.scrollTop > 0) return;
+function onHandleTouchStart(e: TouchEvent) {
   startY = e.touches[0]!.clientY;
-  dragging.value = true;
+  dragging = true;
   dragY.value = 0;
 }
 
-function onTouchMove(e: TouchEvent) {
-  if (!dragging.value) return;
+function onHandleTouchMove(e: TouchEvent) {
+  if (!dragging) return;
   const dy = e.touches[0]!.clientY - startY;
   if (dy < 0) {
     dragY.value = 0;
@@ -61,9 +58,9 @@ function onTouchMove(e: TouchEvent) {
   e.preventDefault();
 }
 
-function onTouchEnd() {
-  if (!dragging.value) return;
-  dragging.value = false;
+function onHandleTouchEnd() {
+  if (!dragging) return;
+  dragging = false;
   if (dragY.value > 80) {
     emit('close');
   }
@@ -83,14 +80,17 @@ function close() {
         <div
           class="relative bg-gray-900 rounded-t-2xl border-t border-gray-700 max-h-[80vh] flex flex-col"
           :style="dragY > 0 ? { transform: `translateY(${dragY}px)`, transition: 'none' } : undefined"
-          @touchstart="onTouchStart"
-          @touchmove="onTouchMove"
-          @touchend="onTouchEnd"
         >
-          <div class="flex justify-center py-2 cursor-grab" @click="close">
+          <div
+            class="flex justify-center py-2 cursor-grab"
+            @click="close"
+            @touchstart="onHandleTouchStart"
+            @touchmove="onHandleTouchMove"
+            @touchend="onHandleTouchEnd"
+          >
             <div class="w-10 h-1 rounded-full bg-gray-600" />
           </div>
-          <div ref="scrollRef" class="overflow-y-auto px-4 pb-4 flex-1">
+          <div class="overflow-y-auto px-4 pb-4 flex-1">
             <slot />
           </div>
         </div>
