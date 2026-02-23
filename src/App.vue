@@ -12,10 +12,13 @@ import ItemCatalog from './components/ItemCatalog.vue'
 <template>
   <div class="h-dvh flex flex-col overflow-y-auto lg:overflow-hidden">
     <header class="shrink-0 relative flex items-center justify-center border-b border-gray-700 bg-gray-950 px-4 py-5 overflow-hidden">
-      <SolCipherLogo :size="100" class="absolute opacity-70" />
-      <h1 class="relative text-5xl tracking-widest uppercase banner-title z-10">Sol Cipher</h1>
+      <SolCipherLogo :size="140" class="absolute opacity-70" />
+      <div class="relative z-10 flex flex-col items-center">
+        <h1 class="text-5xl tracking-widest uppercase banner-title px-4 pb-1">Sol Cipher</h1>
+        <a href="https://github.com/KrzaQ/sol-cipher/" class="self-end text-xs tracking-[4px] uppercase text-amber-600/70 hover:text-amber-500 -mt-1 mr-1">by KrzaQ</a>
+      </div>
       <div class="banner-particles" aria-hidden="true">
-        <span v-for="n in 15" :key="n" class="particle" :style="{
+        <span v-for="n in 25" :key="n" class="particle" :style="{
           left: (15 + Math.random() * 70) + '%',
           top: (10 + Math.random() * 80) + '%',
           animationDelay: (n * 0.3) + 's',
@@ -24,7 +27,6 @@ import ItemCatalog from './components/ItemCatalog.vue'
           height: (2 + (n % 3)) + 'px',
         }" />
       </div>
-      <a href="https://github.com/KrzaQ/sol-cipher/" class="absolute bottom-1 right-4 text-[10px] tracking-widest uppercase text-amber-700/60 hover:text-amber-500 z-10">by KrzaQ</a>
     </header>
 
     <div class="lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:grid lg:grid-cols-[224px_minmax(0,40rem)_224px] lg:justify-center">
