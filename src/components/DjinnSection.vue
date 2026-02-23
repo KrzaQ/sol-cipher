@@ -50,7 +50,7 @@ function clearAllGlobal() {
         <button @click="clearAllGlobal" class="text-xs text-amber-400 hover:text-amber-300">None</button>
       </div>
     </template>
-    <div class="grid grid-cols-4 gap-2">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
       <div v-for="elem in ELEMENT_NAMES" :key="elem.index" class="rounded-lg p-2 border border-gray-800 bg-gray-900/50">
         <div class="flex items-center justify-between mb-1">
           <h3 class="text-sm font-semibold" :class="ELEMENT_COLORS[elem.index].heading" style="font-family: 'Cinzel Decorative', serif">{{ elem.name }}</h3>

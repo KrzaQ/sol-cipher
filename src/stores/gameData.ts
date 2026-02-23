@@ -120,8 +120,9 @@ export const useGameDataStore = defineStore('gameData', {
       this.selectedCharIndex = null;
     },
 
-    assignItem(itemId: number) {
-      if (this.selectedCharIndex === null) return;
+    /** Assigns item to first empty slot. Returns [charIndex, slotIndex] or null if full/no selection. */
+    assignItem(itemId: number): [number, number] | null {
+      if (this.selectedCharIndex === null) return null;
       const charItems = this.gameData.items[this.selectedCharIndex]!;
 
       // Find first empty slot from top
@@ -132,10 +133,11 @@ export const useGameDataStore = defineStore('gameData', {
           break;
         }
       }
-      if (emptyIndex === -1) return; // inventory full
+      if (emptyIndex === -1) return null; // inventory full
 
       const qty = QUANTITY_SET.has(itemId) ? 1 : 0;
       charItems[emptyIndex] = { itemId, quantity: qty };
+      return [this.selectedCharIndex, emptyIndex];
     },
 
     setCoins(value: number) {

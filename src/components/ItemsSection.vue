@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 import { useGameDataStore } from '../stores/gameData';
 import {
   CHARACTER_NAMES,
@@ -17,8 +17,18 @@ import {
 } from '../codec';
 import { CHAR_COLORS } from '../elementColors';
 import CollapsibleSection from './CollapsibleSection.vue';
+import BottomSheet from './BottomSheet.vue';
+import ItemCatalog from './ItemCatalog.vue';
 
 const store = useGameDataStore();
+
+const lgQuery = window.matchMedia('(min-width: 1024px)');
+const isDesktop = ref(lgQuery.matches);
+function onMediaChange(e: MediaQueryListEvent) { isDesktop.value = e.matches; }
+onMounted(() => lgQuery.addEventListener('change', onMediaChange));
+onUnmounted(() => lgQuery.removeEventListener('change', onMediaChange));
+
+const sheetOpen = ref(false);
 
 const QUANTITY_SET = new Set(QUANTITY_ITEM_IDS);
 const PSYNERGY_SET = new Set(PSYNERGY_ITEM_IDS);
@@ -72,11 +82,21 @@ function applyPreset(preset: typeof ITEM_PRESETS[number]) {
 }
 
 function toggleChar(ci: number) {
-  if (store.selectedCharIndex === ci) {
-    store.clearSelection();
+  if (isDesktop.value) {
+    if (store.selectedCharIndex === ci) {
+      store.clearSelection();
+    } else {
+      store.selectChar(ci);
+    }
   } else {
     store.selectChar(ci);
+    sheetOpen.value = true;
   }
+}
+
+function closeSheet() {
+  sheetOpen.value = false;
+  store.clearSelection();
 }
 
 function clearSlot(ci: number, si: number) {
@@ -92,21 +112,47 @@ function clampQuantity(ci: number, si: number, value: string) {
 }
 
 const itemGridCols = computed(() => {
+  if (!isDesktop.value) return undefined;
   const si = store.selectedCharIndex;
   if (si === null) return 'repeat(4, 1fr)';
   return CHARACTER_NAMES.map((_, i) => i === si ? '2fr' : '1fr').join(' ');
 });
 
+function isExpanded(ci: number): boolean {
+  if (!isDesktop.value) return true; // mobile: always expanded
+  return store.selectedCharIndex === ci;
+}
+
 function setQuantity(ci: number, si: number, qty: number) {
   const slot = store.gameData.items[ci]![si]!;
   store.setItem(ci, si, slot.itemId, qty);
+}
+
+const itemsEl = ref<HTMLElement | null>(null);
+
+function onItemAdded(ci: number, si: number) {
+  nextTick(() => {
+    const el = itemsEl.value?.querySelector(`[data-slot="${ci}-${si}"]`) as HTMLElement | null;
+    if (!el) return;
+    // Find the scrollable ancestor (the root div with overflow-y-auto)
+    let scroller: HTMLElement | null = el.parentElement;
+    while (scroller && scroller.scrollHeight <= scroller.clientHeight) {
+      scroller = scroller.parentElement;
+    }
+    if (!scroller) return;
+    const elRect = el.getBoundingClientRect();
+    const scrollerRect = scroller.getBoundingClientRect();
+    // Scroll item to near the top — the bottom sheet covers most of the screen
+    const target = scroller.scrollTop + (elRect.top - scrollerRect.top) - 16;
+    scroller.scrollTo({ top: target, behavior: 'smooth' });
+  });
 }
 </script>
 
 <template>
   <CollapsibleSection title="Items">
     <template #header-right>
-      <div v-if="store.isGold" class="flex gap-1 font-normal">
+      <div v-if="store.isGold" class="flex flex-wrap gap-1 font-normal">
         <template v-for="(preset, i) in ITEM_PRESETS" :key="preset.name">
           <span v-if="i > 0" class="text-xs text-gray-600">|</span>
           <button
@@ -119,7 +165,7 @@ function setQuantity(ci: number, si: number, qty: number) {
     <div v-if="!store.isGold" class="text-sm text-gray-400">
       Items are only available in Gold passwords.
     </div>
-    <div v-else class="grid gap-2" :style="{ gridTemplateColumns: itemGridCols }">
+    <div v-else ref="itemsEl" class="grid grid-cols-1 gap-2" :style="itemGridCols ? { gridTemplateColumns: itemGridCols } : undefined">
       <div
         v-for="(charName, ci) in CHARACTER_NAMES"
         :key="ci"
@@ -134,6 +180,7 @@ function setQuantity(ci: number, si: number, qty: number) {
           <div
             v-for="si in SLOT_INDICES"
             :key="si"
+            :data-slot="`${ci}-${si}`"
             class="flex items-center gap-1 text-sm px-1 py-0.5"
           >
             <template v-if="store.gameData.items[ci]![si]!.itemId === 0">
@@ -149,8 +196,8 @@ function setQuantity(ci: number, si: number, qty: number) {
               <span v-if="KEY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
               <span v-if="QUEST_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
               <span v-if="store.gameData.items[ci]![si]!.itemId > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
-              <span v-if="store.selectedCharIndex === null && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">{{ store.gameData.items[ci]![si]!.quantity }}</span>
-              <template v-if="store.selectedCharIndex === ci">
+              <span v-if="!isExpanded(ci) && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">{{ store.gameData.items[ci]![si]!.quantity }}</span>
+              <template v-if="isExpanded(ci)">
                 <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
                   <button
                     class="text-gray-500 hover:text-amber-400 text-xs px-0.5"
@@ -183,5 +230,8 @@ function setQuantity(ci: number, si: number, qty: number) {
         </div>
       </div>
     </div>
+    <BottomSheet :open="sheetOpen" @close="closeSheet">
+      <ItemCatalog @item-added="onItemAdded" />
+    </BottomSheet>
   </CollapsibleSection>
 </template>

@@ -12,6 +12,8 @@ import {
   CROSS_GAME_DIFFERENCES,
 } from '../codec';
 
+const emit = defineEmits<{ itemAdded: [charIndex: number, slotIndex: number] }>();
+
 const store = useGameDataStore();
 const search = ref('');
 
@@ -67,7 +69,8 @@ function isDisabled(itemId: number): boolean {
 
 function pickItem(itemId: number) {
   if (isDisabled(itemId)) return;
-  store.assignItem(itemId);
+  const result = store.assignItem(itemId);
+  if (result) emit('itemAdded', result[0], result[1]);
 }
 
 function gs1Name(itemId: number): string | undefined {
