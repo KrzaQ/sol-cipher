@@ -124,6 +124,19 @@ function isExpanded(ci: number): boolean {
   return store.selectedCharIndex === ci;
 }
 
+type Badge = 'Req' | 'Forge' | 'Psy' | 'Key' | 'GS1' | 'TLA' | 'Quest';
+
+function topBadge(itemId: number): Badge | null {
+  if (REQUIRED_SET.has(itemId)) return 'Req';
+  if (RUSTY_FORGE_MAP.has(itemId)) return 'Forge';
+  if (PSYNERGY_SET.has(itemId)) return 'Psy';
+  if (KEY_SET.has(itemId)) return 'Key';
+  if (CROSS_GAME_MAP.has(itemId)) return 'GS1';
+  if (itemId > MAX_GS1_ITEM_ID) return 'TLA';
+  if (QUEST_SET.has(itemId)) return 'Quest';
+  return null;
+}
+
 function setQuantity(ci: number, si: number, qty: number) {
   const slot = store.gameData.items[ci]![si]!;
   store.setItem(ci, si, slot.itemId, qty);
@@ -191,13 +204,24 @@ function onItemAdded(ci: number, si: number) {
               <span class="flex-1 truncate text-amber-50">
                 {{ TLA_ITEMS.get(store.gameData.items[ci]![si]!.itemId) ?? `#${store.gameData.items[ci]![si]!.itemId}` }}
               </span>
-              <span v-if="CROSS_GAME_MAP.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-orange-400" :title="`Called '${CROSS_GAME_MAP.get(store.gameData.items[ci]![si]!.itemId)}' in GS1`">GS1</span>
-              <span v-if="REQUIRED_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-red-400" title="Required for TLA completion">Req</span>
-              <span v-if="PSYNERGY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
-              <span v-if="KEY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
-              <span v-if="QUEST_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
-              <span v-if="store.gameData.items[ci]![si]!.itemId > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
-              <span v-if="RUSTY_FORGE_MAP.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-pink-400" :title="`Forges into ${RUSTY_FORGE_MAP.get(store.gameData.items[ci]![si]!.itemId)}`">Forge</span>
+              <template v-if="isExpanded(ci)">
+                <span v-if="CROSS_GAME_MAP.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-orange-400" :title="`Called '${CROSS_GAME_MAP.get(store.gameData.items[ci]![si]!.itemId)}' in GS1`">GS1</span>
+                <span v-if="REQUIRED_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-red-400" title="Required for TLA completion">Req</span>
+                <span v-if="PSYNERGY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
+                <span v-if="KEY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
+                <span v-if="QUEST_SET.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
+                <span v-if="store.gameData.items[ci]![si]!.itemId > MAX_GS1_ITEM_ID" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
+                <span v-if="RUSTY_FORGE_MAP.has(store.gameData.items[ci]![si]!.itemId)" class="shrink-0 text-[10px] font-semibold text-pink-400" :title="`Forges into ${RUSTY_FORGE_MAP.get(store.gameData.items[ci]![si]!.itemId)}`">Forge</span>
+              </template>
+              <template v-else>
+                <span v-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'Req'" class="shrink-0 text-[10px] font-semibold text-red-400">Req</span>
+                <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'Forge'" class="shrink-0 text-[10px] font-semibold text-pink-400" :title="`Forges into ${RUSTY_FORGE_MAP.get(store.gameData.items[ci]![si]!.itemId)}`">Forge</span>
+                <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'Psy'" class="shrink-0 text-[10px] font-semibold text-cyan-400">Psy</span>
+                <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'Key'" class="shrink-0 text-[10px] font-semibold text-amber-400">Key</span>
+                <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'GS1'" class="shrink-0 text-[10px] font-semibold text-orange-400" :title="`Called '${CROSS_GAME_MAP.get(store.gameData.items[ci]![si]!.itemId)}' in GS1`">GS1</span>
+                <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'TLA'" class="shrink-0 text-[10px] font-semibold text-violet-400">TLA</span>
+                <span v-else-if="topBadge(store.gameData.items[ci]![si]!.itemId) === 'Quest'" class="shrink-0 text-[10px] font-semibold text-emerald-400">Quest</span>
+              </template>
               <span v-if="!isExpanded(ci) && QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)" class="text-xs text-gray-500">{{ store.gameData.items[ci]![si]!.quantity }}</span>
               <template v-if="isExpanded(ci)">
                 <template v-if="QUANTITY_SET.has(store.gameData.items[ci]![si]!.itemId)">
